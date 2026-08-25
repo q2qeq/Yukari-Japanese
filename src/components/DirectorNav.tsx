@@ -7,6 +7,11 @@ const NAV = [
   { href: "/director", label: "홈" },
   { href: "/director/unpaid", label: "미수·알림 현황" },
   { href: "/director/consultations", label: "상담 관리" },
+  { href: "/director/payments", label: "결제 내역" },
+  { href: "/director/schedule", label: "전체 시간표" },
+  { href: "/director/classrooms", label: "강의실" },
+  { href: "/director/students", label: "학생 관리" },
+  { href: "/director/staff", label: "선생님 관리" },
 ];
 
 export function DirectorNav() {

@@ -9,6 +9,10 @@ insert into staff (id, name, role, phone, password_hash) values
   ('22222222-2222-2222-2222-222222222222', '이선생', 'teacher', '01033334444', '$2b$10$h8TUO6pLK2rd9fqZEyc3Ae8sIffGvWnILcWucaqkWiE79vZtm2SL2'),
   ('99999999-9999-9999-9999-999999999999', '박원장', 'owner',   '01099998888', '$2b$10$hpKPOTWrcLkkVBwPUnsOZuveRdNDJ0Nok8eCGoFfAHIgG4wBCAC.a');
 
+insert into classrooms (id, name, capacity) values
+  ('e0000000-0000-0000-0000-000000000001', 'A룸', 12),
+  ('e0000000-0000-0000-0000-000000000002', 'B룸', 8);
+
 insert into students (id, name, phone, is_minor, guardian_phone, level, primary_teacher_id, status) values
   ('a0000000-0000-0000-0000-000000000001', '박지민', '01021110001', false, null,          '초급', '11111111-1111-1111-1111-111111111111', 'active'),
   ('a0000000-0000-0000-0000-000000000002', '이하늘', '01021110002', false, null,          '초급', '11111111-1111-1111-1111-111111111111', 'active'),
@@ -19,9 +23,9 @@ insert into students (id, name, phone, is_minor, guardian_phone, level, primary_
   ('a0000000-0000-0000-0000-000000000007', '윤도경', '01021110007', false, null,          '중급', '22222222-2222-2222-2222-222222222222', 'active'),
   ('a0000000-0000-0000-0000-000000000008', '신은우', '01021110008', false, null,          '중급', '22222222-2222-2222-2222-222222222222', 'active');
 
-insert into classes (id, name, level, teacher_id, capacity) values
-  ('b0000000-0000-0000-0000-000000000001', '월수 저녁 초급반', '초급', '11111111-1111-1111-1111-111111111111', 10),
-  ('b0000000-0000-0000-0000-000000000002', '화목 중급반',     '중급', '22222222-2222-2222-2222-222222222222', 10);
+insert into classes (id, name, level, teacher_id, capacity, classroom_id) values
+  ('b0000000-0000-0000-0000-000000000001', '월수 저녁 초급반', '초급', '11111111-1111-1111-1111-111111111111', 10, 'e0000000-0000-0000-0000-000000000001'),
+  ('b0000000-0000-0000-0000-000000000002', '화목 중급반',     '중급', '22222222-2222-2222-2222-222222222222', 10, 'e0000000-0000-0000-0000-000000000002');
 
 insert into class_schedule_slots (class_id, day_of_week, start_time, end_time) values
   ('b0000000-0000-0000-0000-000000000001', 1, '19:00', '20:00'),

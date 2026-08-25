@@ -94,6 +94,130 @@ export async function getConsultations() {
   `;
 }
 
+// ----------------------------------------------------------------------------
+// 선생님(staff) DB 관리 (원장 전용)
+// ----------------------------------------------------------------------------
+
+export type StaffListRow = {
+  id: string;
+  name: string;
+  role: "owner" | "teacher";
+  phone: string;
+  email: string | null;
+  is_active: boolean;
+  class_count: number;
+  student_count: number;
+};
+
+export async function listStaff() {
+  return sql<StaffListRow[]>`
+    select
+      st.id, st.name, st.role, st.phone, st.email, st.is_active,
+      (select count(*)::int from classes c where c.teacher_id = st.id and c.status = 'active') as class_count,
+      (select count(*)::int from students s where s.primary_teacher_id = st.id and s.status = 'active') as student_count
+    from staff st
+    order by (st.role = 'owner') desc, (st.is_active) desc, st.name
+  `;
+}
+
+export type StaffEditData = {
+  id: string;
+  name: string;
+  role: "owner" | "teacher";
+  phone: string;
+  email: string | null;
+  is_active: boolean;
+};
+
+export async function getStaffForEdit(staffId: string) {
+  const rows = await sql<StaffEditData[]>`
+    select id, name, role, phone, email, is_active from staff where id = ${staffId}
+  `;
+  return rows[0] ?? null;
+}
+
+// ----------------------------------------------------------------------------
+// 전체 시간표 (모든 선생님 합산) / 강의실 기준 시간표
+// ----------------------------------------------------------------------------
+
+export type AllClassScheduleRow = {
+  class_id: string;
+  class_name: string;
+  level: string | null;
+  teacher_id: string;
+  teacher_name: string;
+  classroom_id: string | null;
+  classroom_name: string | null;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  enrolled_count: number;
+};
+
+export async function getAllClassesWithSchedule() {
+  return sql<AllClassScheduleRow[]>`
+    select
+      c.id as class_id, c.name as class_name, c.level,
+      c.teacher_id, st.name as teacher_name,
+      c.classroom_id, cr.name as classroom_name,
+      slot.day_of_week, slot.start_time, slot.end_time,
+      (select count(*)::int from class_enrollments ce
+         where ce.class_id = c.id and ce.status = 'active') as enrolled_count
+    from classes c
+    join class_schedule_slots slot on slot.class_id = c.id
+    join staff st on st.id = c.teacher_id
+    left join classrooms cr on cr.id = c.classroom_id
+    where c.status = 'active'
+    order by slot.day_of_week, slot.start_time
+  `;
+}
+
+export type ClassroomRow = { id: string; name: string; capacity: number | null; memo: string | null };
+
+export async function listClassroomsFull() {
+  return sql<ClassroomRow[]>`
+    select id, name, capacity, memo from classrooms order by name
+  `;
+}
+
+// ----------------------------------------------------------------------------
+// 결제 내역 (원장 대시보드에서 확인)
+// ----------------------------------------------------------------------------
+
+export type PaymentHistoryRow = {
+  id: string;
+  student_id: string;
+  student_name: string;
+  pass_name: string;
+  total_sessions: number;
+  price: number;
+  payment_method: "cash" | "bank_transfer" | "card" | "other";
+  purchased_at: string;
+  carried_sessions: number;
+  remaining_sessions: number;
+};
+
+export async function getRecentPayments(limit = 100) {
+  return sql<PaymentHistoryRow[]>`
+    select
+      p.id, p.student_id, s.name as student_name, p.pass_name, p.total_sessions,
+      p.price, p.payment_method, p.purchased_at, p.carried_sessions, p.remaining_sessions
+    from payment_passes p
+    join students s on s.id = p.student_id
+    order by p.purchased_at desc, p.created_at desc
+    limit ${limit}
+  `;
+}
+
+export async function getTodayPaymentStats() {
+  const [row] = await sql<{ count: number; total: number }[]>`
+    select count(*)::int as count, coalesce(sum(price), 0)::int as total
+    from payment_passes
+    where purchased_at = current_date
+  `;
+  return row ?? { count: 0, total: 0 };
+}
+
 export async function getDashboardCounts() {
   const [[unpaid], [lowBalance], [newConsult], [dueFollowUp]] = await Promise.all([
     sql<{ count: number }[]>`select count(*)::int as count from v_unpaid_candidates`,

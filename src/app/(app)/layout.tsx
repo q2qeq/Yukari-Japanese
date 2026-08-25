@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { logout } from "@/lib/actions/auth-actions";
+import { TeacherNav } from "@/components/TeacherNav";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -25,6 +26,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </button>
         </form>
       </header>
+      <TeacherNav />
       <main className="flex-1 flex flex-col">{children}</main>
     </div>
   );

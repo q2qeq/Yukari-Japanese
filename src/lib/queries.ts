@@ -282,3 +282,133 @@ export async function getRecentAttendance(studentId: string, limit = 5) {
     limit ${limit}
   `;
 }
+
+// ----------------------------------------------------------------------------
+// 학생 DB 추가/수정 (선생님·원장 공용)
+// ----------------------------------------------------------------------------
+
+export type StudentListRow = {
+  student_id: string;
+  name: string;
+  phone: string | null;
+  level: string | null;
+  status: "active" | "paused" | "withdrawn";
+  primary_teacher_id: string | null;
+  primary_teacher_name: string | null;
+  remaining_sessions: number | null;
+};
+
+export async function listAllStudents() {
+  return sql<StudentListRow[]>`
+    select
+      s.id as student_id, s.name, s.phone, s.level, s.status,
+      s.primary_teacher_id, st.name as primary_teacher_name,
+      p.remaining_sessions
+    from students s
+    left join staff st on st.id = s.primary_teacher_id
+    left join payment_passes p on p.student_id = s.id and p.status = 'active'
+    order by (s.status = 'active') desc, s.name
+  `;
+}
+
+export type StudentEditData = {
+  id: string;
+  name: string;
+  phone: string | null;
+  is_minor: boolean;
+  guardian_name: string | null;
+  guardian_phone: string | null;
+  kakao_channel_friend: boolean;
+  level: string | null;
+  primary_teacher_id: string | null;
+  status: "active" | "paused" | "withdrawn";
+  memo: string | null;
+};
+
+export async function getStudentForEdit(studentId: string) {
+  const rows = await sql<StudentEditData[]>`
+    select id, name, phone, is_minor, guardian_name, guardian_phone,
+           kakao_channel_friend, level, primary_teacher_id, status, memo
+    from students
+    where id = ${studentId}
+  `;
+  return rows[0] ?? null;
+}
+
+export type TeacherOption = { id: string; name: string; role: "owner" | "teacher" };
+
+export async function listActiveTeachers() {
+  return sql<TeacherOption[]>`
+    select id, name, role from staff
+    where is_active = true
+    order by (role = 'teacher') desc, name
+  `;
+}
+
+// ----------------------------------------------------------------------------
+// 강의실 DB (조회는 선생님도, 관리는 원장만)
+// ----------------------------------------------------------------------------
+
+export type ClassroomOption = { id: string; name: string; capacity: number | null };
+
+export async function listClassrooms() {
+  return sql<ClassroomOption[]>`
+    select id, name, capacity from classrooms order by name
+  `;
+}
+
+// ----------------------------------------------------------------------------
+// 수업 시간표 (반 개설/조회)
+// ----------------------------------------------------------------------------
+
+export type MyClassRow = {
+  class_id: string;
+  class_name: string;
+  level: string | null;
+  capacity: number;
+  classroom_id: string | null;
+  classroom_name: string | null;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  enrolled_count: number;
+};
+
+export async function getClassesForTeacherSchedule(staffId: string) {
+  return sql<MyClassRow[]>`
+    select
+      c.id as class_id, c.name as class_name, c.level, c.capacity,
+      c.classroom_id, cr.name as classroom_name,
+      slot.day_of_week, slot.start_time, slot.end_time,
+      (select count(*)::int from class_enrollments ce
+         where ce.class_id = c.id and ce.status = 'active') as enrolled_count
+    from classes c
+    join class_schedule_slots slot on slot.class_id = c.id
+    left join classrooms cr on cr.id = c.classroom_id
+    where c.teacher_id = ${staffId} and c.status = 'active'
+    order by slot.day_of_week, slot.start_time
+  `;
+}
+
+/**
+ * 반 개설 화면에서 강의실 중복 체크에 쓸 전체(모든 선생님) 활성 반의
+ * 요일/시간/강의실 목록. 학원 규모가 작아 한 번에 다 불러와도 부담 없다.
+ */
+export async function getAllScheduleSlotsForConflictCheck() {
+  return sql<
+    {
+      class_id: string;
+      class_name: string;
+      classroom_id: string | null;
+      day_of_week: number;
+      start_time: string;
+      end_time: string;
+    }[]
+  >`
+    select c.id as class_id, c.name as class_name, c.classroom_id,
+           slot.day_of_week, slot.start_time, slot.end_time
+    from class_schedule_slots slot
+    join classes c on c.id = slot.class_id
+    where c.status = 'active'
+  `;
+}

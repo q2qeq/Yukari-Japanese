@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   getTodayOverviewAllTeachers,
   getDashboardCounts,
+  getTodayPaymentStats,
 } from "@/lib/director-queries";
 
 function hm(t: string) {
@@ -42,9 +43,10 @@ function StatCard({
 }
 
 export default async function DirectorHomePage() {
-  const [sessions, counts] = await Promise.all([
+  const [sessions, counts, paymentStats] = await Promise.all([
     getTodayOverviewAllTeachers(),
     getDashboardCounts(),
+    getTodayPaymentStats(),
   ]);
 
   const today = new Date().toLocaleDateString("ko-KR", {
@@ -89,6 +91,13 @@ export default async function DirectorHomePage() {
           value={counts.dueFollowUpCount}
           unit="건"
           tone="warn"
+        />
+        <StatCard
+          href="/director/payments"
+          label="오늘 결제 건수"
+          value={paymentStats.count}
+          unit="건"
+          tone="accent"
         />
       </div>
 

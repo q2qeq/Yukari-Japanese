@@ -3,11 +3,12 @@
 import { useActionState, useState } from "react";
 import { chargeSessions, type ChargeState } from "@/lib/actions/charge-actions";
 
-type PaymentMethod = "cash" | "bank_transfer";
+type PaymentMethod = "cash" | "bank_transfer" | "card";
 
 const METHOD_LABEL: Record<PaymentMethod, string> = {
   cash: "현금",
   bank_transfer: "계좌이체",
+  card: "카드",
 };
 
 export function ChargeForm({
@@ -115,19 +116,24 @@ export function ChargeForm({
         <div>
           <p className="text-xs font-semibold text-ink-mid mb-2">결제 수단</p>
           <div className="flex rounded-[10px] border border-line overflow-hidden">
-            {(["cash", "bank_transfer"] as PaymentMethod[]).map((m, i) => (
+            {(["cash", "bank_transfer", "card"] as PaymentMethod[]).map((m, i) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setMethod(m)}
                 className={`flex-1 h-[42px] text-[13px] font-bold ${
-                  i === 1 ? "border-l border-line" : ""
+                  i > 0 ? "border-l border-line" : ""
                 } ${method === m ? "bg-accent text-white" : "text-ink-mid"}`}
               >
                 {METHOD_LABEL[m]}
               </button>
             ))}
           </div>
+          {method === "card" && (
+            <p className="text-[11.5px] text-ink-mid mt-1.5">
+              카드 결제는 별도 단말기로 결제 후, 결제수단만 &quot;카드&quot;로 기록해주세요.
+            </p>
+          )}
         </div>
 
         <div className="rounded-xl bg-accent-soft p-4 flex flex-col gap-1.5">
