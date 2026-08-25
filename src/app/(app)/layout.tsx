@@ -12,7 +12,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="flex items-center justify-between px-5 py-4 border-b border-line-light">
         <Link href="/" className="flex flex-col gap-0.5">
           <span className="text-[11px] text-ink-mid">미도리 일본어학원</span>
-          <span className="text-[15px] font-bold">{session.name} 선생님</span>
+          <span className="text-[15px] font-bold">
+            {session.name} {session.role === "owner" ? "원장님" : "선생님"}
+          </span>
         </Link>
         <form action={logout}>
           <button

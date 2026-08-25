@@ -49,7 +49,7 @@ export async function login(
     maxAge: 60 * 60 * 24 * 30,
   });
 
-  redirect("/");
+  redirect(staff.role === "owner" ? "/director" : "/");
 }
 
 export async function logout() {

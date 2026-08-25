@@ -7,7 +7,7 @@
 insert into staff (id, name, role, phone, password_hash) values
   ('11111111-1111-1111-1111-111111111111', '김선생', 'teacher', '01011112222', '$2b$10$h8TUO6pLK2rd9fqZEyc3Ae8sIffGvWnILcWucaqkWiE79vZtm2SL2'),
   ('22222222-2222-2222-2222-222222222222', '이선생', 'teacher', '01033334444', '$2b$10$h8TUO6pLK2rd9fqZEyc3Ae8sIffGvWnILcWucaqkWiE79vZtm2SL2'),
-  ('99999999-9999-9999-9999-999999999999', '박원장', 'owner',   '01099998888', '$2b$10$tWxEF6y2aOuMPlSx6I07ueWDzGKF7Xa7nkp9FVkykJC1geprdBDq6K');
+  ('99999999-9999-9999-9999-999999999999', '박원장', 'owner',   '01099998888', '$2b$10$hpKPOTWrcLkkVBwPUnsOZuveRdNDJ0Nok8eCGoFfAHIgG4wBCAC.a');
 
 insert into students (id, name, phone, is_minor, guardian_phone, level, primary_teacher_id, status) values
   ('a0000000-0000-0000-0000-000000000001', '박지민', '01021110001', false, null,          '초급', '11111111-1111-1111-1111-111111111111', 'active'),
@@ -74,3 +74,11 @@ insert into attendance (class_session_id, student_id, status, checked_by, checke
   ('c0000000-0000-0000-0000-000000000010', 'a0000000-0000-0000-0000-000000000003', 'present', '11111111-1111-1111-1111-111111111111', now() - interval '5 day'),
   ('c0000000-0000-0000-0000-000000000011', 'a0000000-0000-0000-0000-000000000003', 'absent',  '11111111-1111-1111-1111-111111111111', now() - interval '7 day'),
   ('c0000000-0000-0000-0000-000000000012', 'a0000000-0000-0000-0000-000000000003', 'present', '11111111-1111-1111-1111-111111111111', now() - interval '12 day');
+
+-- 원장 대시보드 - 상담 관리 데모 데이터
+insert into consultations (name, phone, source, interested_level, status, follow_up_at, notes) values
+  ('김민재', '01055551111', 'kakao_channel', '초급', 'new', current_date, '카카오 채널로 문의, 아직 연락 전'),
+  ('이수아', '01055552222', 'phone', '초급', 'contacted', current_date + 2, '전화 상담 완료, 체험 수업 일정 조율 중'),
+  ('박현우', '01055553333', 'walk_in', '중급', 'trial_scheduled', current_date + 1, '이번 주 화요일 체험 수업 예정'),
+  ('정다은', '01055554444', 'referral', '초급', 'converted', null, '지인 소개로 등록 완료'),
+  ('최유리', '01055555555', 'online_form', '중급', 'lost', null, '비용 문제로 등록 보류');

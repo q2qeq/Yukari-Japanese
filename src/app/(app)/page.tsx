@@ -1,6 +1,11 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { getTodaySessionsForTeacher } from "@/lib/queries";
+import {
+  getTodaySessionsForTeacher,
+  getRescheduleRequestsForTeacher,
+  getMyBalanceAlerts,
+} from "@/lib/queries";
 
 function hm(t: string) {
   return t.slice(0, 5);
@@ -18,7 +23,13 @@ function statusBadge(enrolled: number, checked: number) {
 
 export default async function TeacherHomePage() {
   const session = await getSession();
-  const sessions = await getTodaySessionsForTeacher(session!.staffId);
+  if (session!.role === "owner") redirect("/director");
+  const [sessions, rescheduleRequests, balanceAlerts] = await Promise.all([
+    getTodaySessionsForTeacher(session!.staffId),
+    getRescheduleRequestsForTeacher(session!.staffId),
+    getMyBalanceAlerts(session!.staffId),
+  ]);
+  const pendingRescheduleCount = rescheduleRequests.filter((r) => r.status === "pending").length;
 
   const today = new Date().toLocaleDateString("ko-KR", {
     year: "numeric",
@@ -33,8 +44,44 @@ export default async function TeacherHomePage() {
         <p className="text-xs text-ink-mid">{today}</p>
       </div>
 
-      <div className="px-5 pt-3 pb-2 text-xs font-semibold text-ink-mid uppercase tracking-wide">
-        오늘의 수업
+      {(pendingRescheduleCount > 0 || balanceAlerts.length > 0) && (
+        <div className="px-5 pt-3 flex flex-col gap-2">
+          {balanceAlerts.length > 0 && (
+            <Link
+              href="/alerts"
+              className="flex items-center justify-between rounded-xl bg-critical-soft px-4 py-3 hover:opacity-90 transition-opacity"
+            >
+              <span className="text-[13px] font-semibold text-critical">
+                잔여 임박·외상 학생이 있어요
+              </span>
+              <span className="rounded-full bg-critical text-white text-[11px] font-bold px-2 py-0.5">
+                {balanceAlerts.length}
+              </span>
+            </Link>
+          )}
+          {pendingRescheduleCount > 0 && (
+            <Link
+              href="/reschedule"
+              className="flex items-center justify-between rounded-xl bg-warn-soft px-4 py-3 hover:opacity-90 transition-opacity"
+            >
+              <span className="text-[13px] font-semibold text-warn">
+                배정 대기중인 연기 요청이 있어요
+              </span>
+              <span className="rounded-full bg-warn text-white text-[11px] font-bold px-2 py-0.5">
+                {pendingRescheduleCount}
+              </span>
+            </Link>
+          )}
+        </div>
+      )}
+
+      <div className="px-5 pt-3 pb-2 flex items-center justify-between">
+        <span className="text-xs font-semibold text-ink-mid uppercase tracking-wide">
+          오늘의 수업
+        </span>
+        <Link href="/reschedule" className="text-[11.5px] font-semibold text-accent">
+          연기 요청 관리
+        </Link>
       </div>
 
       <div className="flex-1 flex flex-col gap-3 px-5 pb-6">

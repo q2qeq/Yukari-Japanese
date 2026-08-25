@@ -1,6 +1,32 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getStudentDetail, getRecentAttendance } from "@/lib/queries";
+import {
+  getStudentDetail,
+  getRecentAttendance,
+  getRescheduleRequestsForStudent,
+  getRecentNotifications,
+} from "@/lib/queries";
+import { NotifyButton } from "@/components/NotifyButton";
+
+const NOTIFICATION_STATUS_LABEL: Record<string, string> = {
+  sent: "발송됨",
+  pending: "발송 대기",
+  failed: "발송 실패",
+};
+
+const RESCHEDULE_STATUS_LABEL: Record<string, string> = {
+  pending: "요청 대기중",
+  scheduled: "보강 확정",
+  completed: "완료",
+  canceled: "취소됨",
+};
+
+const RESCHEDULE_STATUS_CLASS: Record<string, string> = {
+  pending: "bg-warn-soft text-warn",
+  scheduled: "bg-accent-soft text-accent",
+  completed: "bg-good-soft text-good",
+  canceled: "bg-surface text-ink-mid",
+};
 
 const STATUS_LABEL: Record<string, string> = {
   present: "출석",
@@ -26,9 +52,17 @@ export default async function StudentDetailPage({
   if (!student) notFound();
 
   const history = await getRecentAttendance(studentId);
+  const rescheduleRequests = await getRescheduleRequestsForStudent(studentId);
+  const notifications = await getRecentNotifications(studentId);
 
   const remaining = student.remaining_sessions;
   const isOverdue = remaining !== null && remaining <= 0;
+  const isLowBalance = remaining !== null && remaining > 0 && remaining <= 2;
+  const notifyKind: "low_balance" | "payment_overdue" | null = isOverdue
+    ? "payment_overdue"
+    : isLowBalance
+      ? "low_balance"
+      : null;
 
   return (
     <div className="flex-1 flex flex-col">
@@ -101,24 +135,90 @@ export default async function StudentDetailPage({
             회차 충전
           </Link>
           <div className="flex gap-2.5">
-            <button
-              type="button"
-              disabled
-              title="카카오톡 알림톡 연동 준비 중"
-              className="flex-1 h-11 rounded-lg border border-line text-ink-mid text-[13px] font-bold opacity-60"
+            {notifyKind ? (
+              <NotifyButton studentId={studentId} kind={notifyKind} />
+            ) : (
+              <button
+                type="button"
+                disabled
+                title="잔여 회차가 충분해 알림 대상이 아닙니다"
+                className="flex-1 h-11 rounded-lg border border-line text-ink-mid text-[13px] font-bold opacity-40"
+              >
+                알림 대상 아님
+              </button>
+            )}
+            <Link
+              href={`/students/${studentId}/reschedule`}
+              className="flex-1 h-11 rounded-lg border border-line text-ink text-[13px] font-bold flex items-center justify-center"
             >
-              알림 보내기 (준비 중)
-            </button>
-            <button
-              type="button"
-              disabled
-              title="연기 요청 기능 준비 중"
-              className="flex-1 h-11 rounded-lg border border-line text-ink-mid text-[13px] font-bold opacity-60"
-            >
-              연기 요청 (준비 중)
-            </button>
+              연기 요청
+            </Link>
           </div>
         </div>
+
+        {rescheduleRequests.filter((r) => r.status !== "canceled").length > 0 && (
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-ink-mid uppercase tracking-wide mb-2">
+              연기 요청
+            </span>
+            {rescheduleRequests
+              .filter((r) => r.status !== "canceled")
+              .map((r) => (
+                <div
+                  key={r.id}
+                  className="flex items-center justify-between py-2.5 border-b border-line-light last:border-none"
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[13px] font-semibold">{r.class_name}</span>
+                    <span className="text-[11.5px] text-ink-mid">
+                      원래{" "}
+                      {new Date(r.session_date).toLocaleDateString("ko-KR", {
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
+                      {r.makeup_date &&
+                        ` → 보강 ${new Date(r.makeup_date).toLocaleDateString("ko-KR", {
+                          month: "2-digit",
+                          day: "2-digit",
+                        })} ${r.makeup_start?.slice(0, 5)}`}
+                    </span>
+                  </div>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold shrink-0 ${RESCHEDULE_STATUS_CLASS[r.status]}`}
+                  >
+                    {RESCHEDULE_STATUS_LABEL[r.status]}
+                  </span>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {notifications.length > 0 && (
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-ink-mid uppercase tracking-wide mb-2">
+              알림 발송 이력
+            </span>
+            {notifications.map((n) => (
+              <div
+                key={n.id}
+                className="flex items-center justify-between gap-2 py-2.5 border-b border-line-light last:border-none"
+              >
+                <span className="text-[12px] text-ink-mid line-clamp-1">{n.content}</span>
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${
+                    n.status === "sent"
+                      ? "bg-good-soft text-good"
+                      : n.status === "pending"
+                        ? "bg-surface text-ink-mid"
+                        : "bg-critical-soft text-critical"
+                  }`}
+                >
+                  {NOTIFICATION_STATUS_LABEL[n.status]}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-col">
           <span className="text-xs font-semibold text-ink-mid uppercase tracking-wide mb-2">
