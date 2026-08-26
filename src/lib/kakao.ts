@@ -65,7 +65,7 @@ async function callProviderApi(params: {
 
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    return { ok: false, error: `알림톡 발송 API 오류 (${res.status}): ${body.slice(0, 200)}` };
+    return { ok: false, error: `通知メッセージ送信APIエラー (${res.status}): ${body.slice(0, 200)}` };
   }
   return { ok: true };
 }
@@ -84,7 +84,7 @@ export async function sendKakaoAlimtalk({
       ok: false,
       channel: "kakao_alimtalk",
       status: "failed",
-      error: "수신 번호(학생 또는 보호자 연락처)가 없습니다.",
+      error: "受信番号(生徒または保護者の連絡先)がありません。",
     };
   }
 
@@ -94,7 +94,7 @@ export async function sendKakaoAlimtalk({
       channel: "kakao_alimtalk",
       status: "pending",
       error:
-        "카카오 알림톡 연동 전이라 실제 발송 없이 기록만 저장했습니다. 사업자등록·템플릿 승인 후 .env에 키를 넣으면 자동으로 실제 발송됩니다.",
+        "カカオ通知メッセージ連携前のため、実際の送信は行わず記録のみ保存しました。事業者登録・テンプレート承認後に.envにキーを設定すると自動的に実際の送信が始まります。",
     };
   }
 
@@ -110,7 +110,7 @@ export async function sendKakaoAlimtalk({
       ok: false,
       channel: "kakao_alimtalk",
       status: "failed",
-      error: err instanceof Error ? err.message : "알 수 없는 오류",
+      error: err instanceof Error ? err.message : "不明なエラー",
     };
   }
 }

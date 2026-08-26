@@ -412,3 +412,112 @@ export async function getAllScheduleSlotsForConflictCheck() {
     where c.status = 'active'
   `;
 }
+
+// ----------------------------------------------------------------------------
+// 반 상세 / 학생 등록(class_enrollments) — 시간표에서 반을 눌렀을 때 쓰는 화면
+// ----------------------------------------------------------------------------
+
+export type ClassDetail = {
+  class_id: string;
+  class_name: string;
+  level: string | null;
+  capacity: number;
+  status: "active" | "archived";
+  teacher_id: string;
+  teacher_name: string;
+  classroom_id: string | null;
+  classroom_name: string | null;
+};
+
+export async function getClassDetail(classId: string) {
+  const rows = await sql<ClassDetail[]>`
+    select
+      c.id as class_id, c.name as class_name, c.level, c.capacity, c.status,
+      c.teacher_id, st.name as teacher_name,
+      c.classroom_id, cr.name as classroom_name
+    from classes c
+    join staff st on st.id = c.teacher_id
+    left join classrooms cr on cr.id = c.classroom_id
+    where c.id = ${classId}
+  `;
+  return rows[0] ?? null;
+}
+
+export type ClassSlotRow = { day_of_week: number; start_time: string; end_time: string };
+
+export async function getClassScheduleSlots(classId: string) {
+  return sql<ClassSlotRow[]>`
+    select day_of_week, start_time, end_time
+    from class_schedule_slots
+    where class_id = ${classId}
+    order by day_of_week, start_time
+  `;
+}
+
+export type ClassRosterRow = {
+  student_id: string;
+  name: string;
+  phone: string | null;
+  status: "active" | "paused" | "withdrawn";
+  remaining_sessions: number | null;
+  enrolled_at: string;
+};
+
+export async function getClassRoster(classId: string) {
+  return sql<ClassRosterRow[]>`
+    select
+      s.id as student_id, s.name, s.phone, s.status,
+      p.remaining_sessions,
+      ce.enrolled_at
+    from class_enrollments ce
+    join students s on s.id = ce.student_id
+    left join payment_passes p on p.student_id = s.id and p.status = 'active'
+    where ce.class_id = ${classId} and ce.status = 'active'
+    order by s.name
+  `;
+}
+
+export type EnrollableStudent = { id: string; name: string; level: string | null };
+
+/** 이 반에 아직(또는 더 이상) 등록돼 있지 않은 재원 학생 목록 — 등록 드롭다운용. */
+export async function getEnrollableStudents(classId: string) {
+  return sql<EnrollableStudent[]>`
+    select s.id, s.name, s.level
+    from students s
+    where s.status = 'active'
+      and not exists (
+        select 1 from class_enrollments ce
+        where ce.class_id = ${classId} and ce.student_id = s.id and ce.status = 'active'
+      )
+    order by s.name
+  `;
+}
+
+export type EnrolledClassRow = {
+  slot_id: string;
+  class_id: string;
+  class_name: string;
+  level: string | null;
+  teacher_id: string;
+  teacher_name: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+};
+
+/** 이 학생이 실제로 등록되어 있는 반과, 각 반의 담당 선생님 — 학생 상세 화면용. */
+export async function getEnrolledClassesForStudent(studentId: string) {
+  return sql<EnrolledClassRow[]>`
+    select
+      slot.id as slot_id,
+      c.id as class_id, c.name as class_name, c.level,
+      c.teacher_id, st.name as teacher_name,
+      slot.day_of_week, slot.start_time, slot.end_time
+    from class_enrollments ce
+    join classes c on c.id = ce.class_id
+    join staff st on st.id = c.teacher_id
+    join class_schedule_slots slot on slot.class_id = c.id
+    where ce.student_id = ${studentId} and ce.status = 'active' and c.status = 'active'
+    order by slot.day_of_week, slot.start_time
+  `;
+}

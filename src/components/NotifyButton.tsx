@@ -29,7 +29,7 @@ export function NotifyButton({
         disabled={pending}
         className="w-full h-11 rounded-lg border border-line text-ink text-[13px] font-bold disabled:opacity-60"
       >
-        {pending ? "발송 중..." : "알림 보내기"}
+        {pending ? "送信中..." : "通知を送る"}
       </button>
       {result && (
         <p className={`text-[11px] leading-snug ${result.ok ? "text-ink-mid" : "text-critical"}`}>

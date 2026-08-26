@@ -8,7 +8,7 @@ import {
 import type { TeacherRescheduleRequest } from "@/lib/queries";
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("ko-KR", { month: "2-digit", day: "2-digit", weekday: "short" });
+  return new Date(d).toLocaleDateString("ja-JP", { month: "2-digit", day: "2-digit", weekday: "short" });
 }
 
 function PendingCard({
@@ -51,14 +51,14 @@ function PendingCard({
         <div className="flex flex-col gap-0.5">
           <span className="text-[14px] font-bold">{row.student_name}</span>
           <span className="text-[12px] text-ink-mid">
-            {row.class_name} · 원래 {fmtDate(row.session_date)} {row.start_time.slice(0, 5)}
+            {row.class_name} ・元 {fmtDate(row.session_date)} {row.start_time.slice(0, 5)}
           </span>
         </div>
         <span className="rounded-full bg-warn-soft text-warn text-[10.5px] font-bold px-2.5 py-1 shrink-0">
-          배정 대기
+          割当待ち
         </span>
       </div>
-      {row.reason && <p className="text-[12px] text-ink-mid">사유: {row.reason}</p>}
+      {row.reason && <p className="text-[12px] text-ink-mid">理由：{row.reason}</p>}
 
       <div className="flex items-center gap-2 flex-wrap">
         <input
@@ -91,7 +91,7 @@ function PendingCard({
           disabled={pending}
           className="flex-1 h-9 rounded-lg border border-line text-[12.5px] font-semibold disabled:opacity-60"
         >
-          요청 취소
+          リクエストをキャンセル
         </button>
         <button
           type="button"
@@ -99,7 +99,7 @@ function PendingCard({
           disabled={pending || !date}
           className="flex-[1.5] h-9 rounded-lg bg-accent text-white text-[12.5px] font-bold disabled:opacity-60"
         >
-          {pending ? "처리 중..." : "보강 확정"}
+          {pending ? "処理中..." : "振替を確定"}
         </button>
       </div>
     </div>
@@ -137,10 +137,10 @@ export function RescheduleManager({ initialRows }: { initialRows: TeacherResched
     <div className="flex flex-col gap-6">
       <div>
         <p className="text-xs font-semibold text-ink-mid uppercase tracking-wide mb-2.5">
-          배정 대기중 ({pendingRows.length})
+          割当待ち ({pendingRows.length})
         </p>
         {pendingRows.length === 0 ? (
-          <p className="text-[12.5px] text-ink-mid py-3">대기중인 연기 요청이 없어요.</p>
+          <p className="text-[12.5px] text-ink-mid py-3">保留中の延期リクエストはありません。</p>
         ) : (
           <div className="flex flex-col gap-3">
             {pendingRows.map((row) => (
@@ -158,7 +158,7 @@ export function RescheduleManager({ initialRows }: { initialRows: TeacherResched
       {scheduledRows.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-ink-mid uppercase tracking-wide mb-2.5">
-            보강 확정됨 ({scheduledRows.length})
+            振替確定済み ({scheduledRows.length})
           </p>
           <div className="flex flex-col gap-2">
             {scheduledRows.map((row) => (
@@ -169,12 +169,12 @@ export function RescheduleManager({ initialRows }: { initialRows: TeacherResched
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[13.5px] font-bold">{row.student_name}</span>
                   <span className="text-[12px] text-ink-mid">
-                    {row.class_name} · 원래 {fmtDate(row.session_date)} →{" "}
-                    보강 {row.makeup_date && fmtDate(row.makeup_date)} {row.makeup_start?.slice(0, 5)}
+                    {row.class_name} ・元 {fmtDate(row.session_date)} →{" "}
+                    振替 {row.makeup_date && fmtDate(row.makeup_date)} {row.makeup_start?.slice(0, 5)}
                   </span>
                 </div>
                 <span className="rounded-full bg-accent-soft text-accent text-[10.5px] font-bold px-2.5 py-1 shrink-0">
-                  확정됨
+                  確定済み
                 </span>
               </div>
             ))}

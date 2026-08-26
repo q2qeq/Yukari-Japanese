@@ -20,7 +20,7 @@ export default async function AttendanceCheckPage({
   return (
     <div className="flex-1 flex flex-col">
       <div className="flex items-center gap-3 px-5 pt-[18px] pb-3.5">
-        <Link href="/" aria-label="뒤로">
+        <Link href="/" aria-label="戻る">
           <svg
             width="20"
             height="20"
@@ -37,7 +37,7 @@ export default async function AttendanceCheckPage({
         <div className="flex flex-col gap-0.5">
           <span className="text-[16.5px] font-bold">{session.class_name}</span>
           <span className="font-mono text-[11.5px] text-ink-mid">
-            {new Date(session.session_date).toLocaleDateString("ko-KR", {
+            {new Date(session.session_date).toLocaleDateString("ja-JP", {
               month: "long",
               day: "numeric",
               weekday: "short",

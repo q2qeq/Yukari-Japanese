@@ -13,12 +13,12 @@ function hm(t: string) {
 
 function statusBadge(enrolled: number, checked: number) {
   if (checked === 0) {
-    return { label: "출석체크 필요", className: "bg-accent-soft text-accent" };
+    return { label: "出席チェック未実施", className: "bg-accent-soft text-accent" };
   }
   if (checked < enrolled) {
-    return { label: "진행중", className: "bg-accent-soft text-accent" };
+    return { label: "進行中", className: "bg-accent-soft text-accent" };
   }
-  return { label: "완료", className: "bg-good-soft text-good" };
+  return { label: "完了", className: "bg-good-soft text-good" };
 }
 
 export default async function TeacherHomePage() {
@@ -31,7 +31,7 @@ export default async function TeacherHomePage() {
   ]);
   const pendingRescheduleCount = rescheduleRequests.filter((r) => r.status === "pending").length;
 
-  const today = new Date().toLocaleDateString("ko-KR", {
+  const today = new Date().toLocaleDateString("ja-JP", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -52,7 +52,7 @@ export default async function TeacherHomePage() {
               className="flex items-center justify-between rounded-xl bg-critical-soft px-4 py-3 hover:opacity-90 transition-opacity"
             >
               <span className="text-[13px] font-semibold text-critical">
-                잔여 임박·외상 학생이 있어요
+                残り回数が少ない・未払いの生徒がいます
               </span>
               <span className="rounded-full bg-critical text-white text-[11px] font-bold px-2 py-0.5">
                 {balanceAlerts.length}
@@ -65,7 +65,7 @@ export default async function TeacherHomePage() {
               className="flex items-center justify-between rounded-xl bg-warn-soft px-4 py-3 hover:opacity-90 transition-opacity"
             >
               <span className="text-[13px] font-semibold text-warn">
-                배정 대기중인 연기 요청이 있어요
+                割当待ちの延期リクエストがあります
               </span>
               <span className="rounded-full bg-warn text-white text-[11px] font-bold px-2 py-0.5">
                 {pendingRescheduleCount}
@@ -77,17 +77,17 @@ export default async function TeacherHomePage() {
 
       <div className="px-5 pt-3 pb-2 flex items-center justify-between">
         <span className="text-xs font-semibold text-ink-mid uppercase tracking-wide">
-          오늘의 수업
+          今日の授業
         </span>
         <Link href="/reschedule" className="text-[11.5px] font-semibold text-accent">
-          연기 요청 관리
+          延期リクエスト管理
         </Link>
       </div>
 
       <div className="flex-1 flex flex-col gap-3 px-5 pb-6">
         {sessions.length === 0 && (
           <p className="text-center text-[13px] text-ink-mid py-10">
-            오늘 예정된 수업이 없어요
+            今日予定されている授業はありません
           </p>
         )}
 
@@ -105,7 +105,7 @@ export default async function TeacherHomePage() {
                 </span>
                 <span className="text-[16px] font-bold">{s.class_name}</span>
                 <span className="text-[12.5px] text-ink-mid">
-                  학생 {s.enrolled_count}명 · {s.checked_count}명 체크됨
+                  生徒{s.enrolled_count}名 ・{s.checked_count}名チェック済み
                 </span>
               </div>
               <span

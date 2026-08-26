@@ -9,9 +9,9 @@ export default async function ConsultationManagementPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[22px] font-bold">상담 관리</h1>
+          <h1 className="text-[22px] font-bold">相談管理</h1>
           <p className="text-[13px] text-ink-mid mt-1">
-            신규 상담부터 등록 완료까지 단계별로 관리해요.
+            新規相談から登録完了まで段階別に管理できます。
           </p>
         </div>
       </div>
@@ -20,7 +20,7 @@ export default async function ConsultationManagementPage() {
 
       {consultations.length === 0 ? (
         <div className="bg-white rounded-2xl border border-line-light py-16 text-center text-[13px] text-ink-mid">
-          등록된 상담이 없어요. 위에서 신규 상담을 등록해보세요.
+          登録された相談がありません。上から新規相談を登録してみましょう。
         </div>
       ) : (
         <ConsultationBoard initialRows={consultations} />

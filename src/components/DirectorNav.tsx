@@ -4,14 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
-  { href: "/director", label: "홈" },
-  { href: "/director/unpaid", label: "미수·알림 현황" },
-  { href: "/director/consultations", label: "상담 관리" },
-  { href: "/director/payments", label: "결제 내역" },
-  { href: "/director/schedule", label: "전체 시간표" },
-  { href: "/director/classrooms", label: "강의실" },
-  { href: "/director/students", label: "학생 관리" },
-  { href: "/director/staff", label: "선생님 관리" },
+  { href: "/director", label: "ホーム" },
+  { href: "/director/unpaid", label: "未払い・通知状況" },
+  { href: "/director/consultations", label: "相談管理" },
+  { href: "/director/payments", label: "支払い履歴" },
+  { href: "/director/schedule", label: "全体時間割" },
+  { href: "/director/classrooms", label: "教室" },
+  { href: "/director/students", label: "生徒管理" },
+  { href: "/director/staff", label: "先生管理" },
 ];
 
 export function DirectorNav() {

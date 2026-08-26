@@ -12,9 +12,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex-1 flex flex-col max-w-md w-full mx-auto">
       <header className="flex items-center justify-between px-5 py-4 border-b border-line-light">
         <Link href="/" className="flex flex-col gap-0.5">
-          <span className="text-[11px] text-ink-mid">미도리 일본어학원</span>
+          <span className="text-[11px] text-ink-mid">ゆかり日本語教室</span>
           <span className="text-[15px] font-bold">
-            {session.name} {session.role === "owner" ? "원장님" : "선생님"}
+            {session.name}先生
           </span>
         </Link>
         <form action={logout}>
@@ -22,7 +22,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             type="submit"
             className="text-[12.5px] text-ink-mid font-semibold px-2 py-1"
           >
-            로그아웃
+            ログアウト
           </button>
         </form>
       </header>

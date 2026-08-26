@@ -8,7 +8,7 @@ import {
 import type { UpcomingSessionOption } from "@/lib/queries";
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("ko-KR", {
+  return new Date(d).toLocaleDateString("ja-JP", {
     month: "long",
     day: "numeric",
     weekday: "short",
@@ -31,9 +31,9 @@ export function RescheduleRequestForm({
   if (options.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-2">
-        <p className="text-[14px] font-semibold">연기할 수 있는 예정 수업이 없어요</p>
+        <p className="text-[14px] font-semibold">延期できる予定の授業がありません</p>
         <p className="text-[12.5px] text-ink-mid">
-          이 학생이 등록된 반의 앞으로 예정된 정규 수업이 없거나, 이미 연기 요청이 진행 중이에요.
+          この生徒が登録しているクラスの今後の予定授業がないか、すでに延期リクエストが進行中です。
         </p>
       </div>
     );
@@ -46,7 +46,7 @@ export function RescheduleRequestForm({
 
       <div className="flex-1 overflow-auto px-5 pt-3.5 pb-6 flex flex-col gap-6">
         <div>
-          <p className="text-xs font-semibold text-ink-mid mb-2">연기할 수업 선택</p>
+          <p className="text-xs font-semibold text-ink-mid mb-2">延期する授業を選択</p>
           <div className="flex flex-col gap-2">
             {options.map((opt) => (
               <button
@@ -72,11 +72,11 @@ export function RescheduleRequestForm({
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-ink-mid mb-2">사유 (선택)</p>
+          <p className="text-xs font-semibold text-ink-mid mb-2">理由（任意）</p>
           <textarea
             name="reason"
             rows={3}
-            placeholder="예: 학생 개인 사정으로 결석 예정"
+            placeholder="例：生徒の個人的な事情により欠席予定"
             className="w-full border border-line-light rounded-[10px] px-3.5 py-3 text-[13px] outline-none focus:border-accent resize-none"
           />
         </div>
@@ -94,7 +94,7 @@ export function RescheduleRequestForm({
           disabled={pending}
           className="w-full h-12 rounded-lg bg-accent text-white text-[15px] font-semibold disabled:opacity-60"
         >
-          {pending ? "요청 중..." : "연기 요청 보내기"}
+          {pending ? "リクエスト中..." : "延期リクエストを送る"}
         </button>
       </div>
     </form>

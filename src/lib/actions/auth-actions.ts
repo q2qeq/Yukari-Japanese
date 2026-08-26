@@ -17,7 +17,7 @@ export async function login(
   const password = String(formData.get("password") || "");
 
   if (!phone || !password) {
-    return { error: "전화번호와 비밀번호를 입력해주세요." };
+    return { error: "電話番号とパスワードを入力してください。" };
   }
 
   const rows = await sql<
@@ -26,12 +26,12 @@ export async function login(
   const staff = rows[0];
 
   if (!staff || !staff.is_active) {
-    return { error: "전화번호 또는 비밀번호가 올바르지 않습니다." };
+    return { error: "電話番号またはパスワードが正しくありません。" };
   }
 
   const ok = await bcrypt.compare(password, staff.password_hash);
   if (!ok) {
-    return { error: "전화번호 또는 비밀번호가 올바르지 않습니다." };
+    return { error: "電話番号またはパスワードが正しくありません。" };
   }
 
   const token = signSession({

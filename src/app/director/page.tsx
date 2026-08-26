@@ -49,7 +49,7 @@ export default async function DirectorHomePage() {
     getTodayPaymentStats(),
   ]);
 
-  const today = new Date().toLocaleDateString("ko-KR", {
+  const today = new Date().toLocaleDateString("ja-JP", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -60,54 +60,54 @@ export default async function DirectorHomePage() {
     <div className="flex flex-col gap-7">
       <div>
         <p className="text-xs text-ink-mid mb-1">{today}</p>
-        <h1 className="text-[22px] font-bold">원장 대시보드</h1>
+        <h1 className="text-[22px] font-bold">教室長ダッシュボード</h1>
       </div>
 
       <div className="flex flex-wrap gap-4">
         <StatCard
           href="/director/unpaid"
-          label="미수 학생"
+          label="未払いの生徒"
           value={counts.unpaidCount}
-          unit="명"
+          unit="名"
           tone="critical"
         />
         <StatCard
           href="/director/unpaid?filter=low_balance"
-          label="잔여 임박(1~2회)"
+          label="残り回数少（1〜2回）"
           value={counts.lowBalanceCount}
-          unit="명"
+          unit="名"
           tone="warn"
         />
         <StatCard
           href="/director/consultations"
-          label="신규 상담"
+          label="新規相談"
           value={counts.newConsultationCount}
-          unit="건"
+          unit="件"
           tone="accent"
         />
         <StatCard
           href="/director/consultations"
-          label="후속 연락 필요"
+          label="フォローアップ必要"
           value={counts.dueFollowUpCount}
-          unit="건"
+          unit="件"
           tone="warn"
         />
         <StatCard
           href="/director/payments"
-          label="오늘 결제 건수"
+          label="本日の決済件数"
           value={paymentStats.count}
-          unit="건"
+          unit="件"
           tone="accent"
         />
       </div>
 
       <div className="bg-white rounded-2xl border border-line-light">
         <div className="px-5 py-4 border-b border-line-light">
-          <h2 className="text-[15px] font-bold">오늘의 전체 수업</h2>
+          <h2 className="text-[15px] font-bold">本日の全体授業</h2>
         </div>
         {sessions.length === 0 ? (
           <p className="text-center text-[13px] text-ink-mid py-10">
-            오늘 예정된 수업이 없어요
+            今日予定されている授業はありません
           </p>
         ) : (
           <div className="divide-y divide-line-light">
@@ -124,11 +124,11 @@ export default async function DirectorHomePage() {
                       {hm(s.start_time)}–{hm(s.end_time)}
                     </span>
                     <span className="text-[14.5px] font-bold">{s.class_name}</span>
-                    <span className="text-[12.5px] text-ink-mid">{s.teacher_name} 선생님</span>
+                    <span className="text-[12.5px] text-ink-mid">{s.teacher_name}先生</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[12.5px] text-ink-mid">
-                      {s.checked_count}/{s.enrolled_count}명 체크
+                      {s.checked_count}/{s.enrolled_count}名チェック
                     </span>
                     <span
                       className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
@@ -139,7 +139,7 @@ export default async function DirectorHomePage() {
                           : "bg-surface text-ink-mid"
                       }`}
                     >
-                      {done ? "완료" : started ? "진행중" : "체크 전"}
+                      {done ? "完了" : started ? "進行中" : "チェック前"}
                     </span>
                   </div>
                 </div>

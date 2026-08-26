@@ -6,9 +6,9 @@ import { chargeSessions, type ChargeState } from "@/lib/actions/charge-actions";
 type PaymentMethod = "cash" | "bank_transfer" | "card";
 
 const METHOD_LABEL: Record<PaymentMethod, string> = {
-  cash: "현금",
-  bank_transfer: "계좌이체",
-  card: "카드",
+  cash: "現金",
+  bank_transfer: "口座振込",
+  card: "カード",
 };
 
 export function ChargeForm({
@@ -41,7 +41,7 @@ export function ChargeForm({
 
       <div className="flex-1 overflow-auto px-5 pt-3.5 pb-6 flex flex-col gap-6">
         <div>
-          <p className="text-xs font-semibold text-ink-mid mb-2">대상 학생</p>
+          <p className="text-xs font-semibold text-ink-mid mb-2">対象生徒</p>
           <div className="border border-line-light rounded-[10px] p-3.5 bg-surface flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div
@@ -59,21 +59,21 @@ export function ChargeForm({
               }`}
             >
               {currentRemaining === null
-                ? "수강권 없음"
+                ? "受講パスなし"
                 : isDebt
-                  ? `현재 ${currentRemaining}회 (외상)`
-                  : `현재 ${currentRemaining}회`}
+                  ? `現在${currentRemaining}回（未払い）`
+                  : `現在${currentRemaining}回`}
             </span>
           </div>
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-ink-mid mb-2">충전 회차</p>
+          <p className="text-xs font-semibold text-ink-mid mb-2">チャージ回数</p>
           <div className="flex items-center justify-center gap-5">
             <button
               type="button"
               onClick={() => setSessions((s) => Math.max(1, s - 1))}
-              aria-label="회차 감소"
+              aria-label="回数を減らす"
               className="w-11 h-11 rounded-[10px] border border-line flex items-center justify-center"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -82,12 +82,12 @@ export function ChargeForm({
             </button>
             <div className="font-mono text-[30px] font-extrabold min-w-16 text-center">
               {sessions}
-              <span className="text-[15px] font-semibold text-ink-mid">회</span>
+              <span className="text-[15px] font-semibold text-ink-mid">回</span>
             </div>
             <button
               type="button"
               onClick={() => setSessions((s) => s + 1)}
-              aria-label="회차 증가"
+              aria-label="回数を増やす"
               className="w-11 h-11 rounded-[10px] border border-line flex items-center justify-center"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -98,7 +98,7 @@ export function ChargeForm({
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-ink-mid mb-2">결제 금액</p>
+          <p className="text-xs font-semibold text-ink-mid mb-2">支払い金額</p>
           <div className="h-12 border border-line rounded-lg flex items-center px-3.5 gap-1.5">
             <span className="font-mono text-[16px] font-bold text-ink-mid">₩</span>
             <input
@@ -114,7 +114,7 @@ export function ChargeForm({
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-ink-mid mb-2">결제 수단</p>
+          <p className="text-xs font-semibold text-ink-mid mb-2">支払い方法</p>
           <div className="flex rounded-[10px] border border-line overflow-hidden">
             {(["cash", "bank_transfer", "card"] as PaymentMethod[]).map((m, i) => (
               <button
@@ -131,26 +131,26 @@ export function ChargeForm({
           </div>
           {method === "card" && (
             <p className="text-[11.5px] text-ink-mid mt-1.5">
-              카드 결제는 별도 단말기로 결제 후, 결제수단만 &quot;카드&quot;로 기록해주세요.
+              カード決済は別の端末でお支払い後、支払い方法のみ&quot;カード&quot;として記録してください。
             </p>
           )}
         </div>
 
         <div className="rounded-xl bg-accent-soft p-4 flex flex-col gap-1.5">
-          <p className="text-xs font-semibold text-accent">자동 정산 미리보기</p>
+          <p className="text-xs font-semibold text-accent">自動精算プレビュー</p>
           {isDebt ? (
             <p className="text-[13px] text-accent">
-              기존 외상 {carried}회가 자동으로 차감되고,
+              未払い分{carried}回が自動的に相殺され、
             </p>
           ) : carried > 0 ? (
-            <p className="text-[13px] text-accent">기존 잔여 {carried}회가 이월되고,</p>
+            <p className="text-[13px] text-accent">既存の残り{carried}回が繰り越され、</p>
           ) : (
-            <p className="text-[13px] text-accent">기존 잔여 없이 새로 시작하며,</p>
+            <p className="text-[13px] text-accent">既存の残りなしで新しく開始し、</p>
           )}
           <div className="flex items-baseline gap-1.5 mt-0.5">
-            <span className="text-[12.5px] text-accent">충전 후 잔여</span>
+            <span className="text-[12.5px] text-accent">チャージ後の残り</span>
             <span className="font-mono text-[22px] font-extrabold text-accent">
-              {afterRemaining}회
+              {afterRemaining}回
             </span>
             <span className="text-xs text-accent/70">
               ({sessions} {carried >= 0 ? "+" : "−"} {Math.abs(carried)})
@@ -171,7 +171,7 @@ export function ChargeForm({
           disabled={pending}
           className="w-full h-12 rounded-lg bg-accent text-white text-[15px] font-semibold disabled:opacity-60"
         >
-          {pending ? "처리 중..." : "충전 완료"}
+          {pending ? "処理中..." : "チャージ完了"}
         </button>
       </div>
     </form>

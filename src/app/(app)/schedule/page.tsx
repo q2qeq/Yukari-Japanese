@@ -13,12 +13,12 @@ export default async function TeacherSchedulePage() {
   return (
     <div className="flex-1 flex flex-col px-5 pt-5 pb-8 gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-[16.5px] font-bold">내 시간표</h1>
+        <h1 className="text-[16.5px] font-bold">マイ時間割</h1>
         <Link
           href="/schedule/new"
           className="rounded-lg bg-accent text-white text-[12.5px] font-semibold px-3.5 py-2"
         >
-          + 반 개설
+          + クラス開設
         </Link>
       </div>
 
@@ -34,7 +34,7 @@ export default async function TeacherSchedulePage() {
           enrolled_count: r.enrolled_count,
         }))}
         showClassroom
-        emptyMessage="아직 개설한 반이 없어요. '반 개설'로 시작해보세요."
+        emptyMessage="まだ開設したクラスがありません。「クラス開設」から始めましょう。"
       />
     </div>
   );

@@ -37,7 +37,7 @@ export async function createConsultation(
 ): Promise<CreateConsultationState> {
   const session = await getSession();
   if (!session || session.role !== "owner") {
-    return { error: "권한이 없습니다." };
+    return { error: "権限がありません。" };
   }
 
   const name = String(formData.get("name") || "").trim();
@@ -47,9 +47,9 @@ export async function createConsultation(
   const followUpAt = String(formData.get("followUpAt") || "").trim();
   const notes = String(formData.get("notes") || "").trim();
 
-  if (!name) return { error: "이름을 입력해주세요." };
+  if (!name) return { error: "名前を入力してください。" };
   if (!SOURCES.includes(source as ConsultationSource)) {
-    return { error: "유입 경로를 확인해주세요." };
+    return { error: "流入経路をご確認ください。" };
   }
 
   await sql`
@@ -72,10 +72,10 @@ export async function updateConsultationStatus(
 ): Promise<ActionResult> {
   const session = await getSession();
   if (!session || session.role !== "owner") {
-    return { ok: false, error: "권한이 없습니다." };
+    return { ok: false, error: "権限がありません。" };
   }
   if (!STATUSES.includes(status)) {
-    return { ok: false, error: "잘못된 상태입니다." };
+    return { ok: false, error: "無効なステータスです。" };
   }
 
   await sql`update consultations set status = ${status} where id = ${id}`;
@@ -91,7 +91,7 @@ export async function updateConsultationNotes(
 ): Promise<ActionResult> {
   const session = await getSession();
   if (!session || session.role !== "owner") {
-    return { ok: false, error: "권한이 없습니다." };
+    return { ok: false, error: "権限がありません。" };
   }
 
   await sql`

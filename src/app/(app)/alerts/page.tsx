@@ -10,18 +10,18 @@ export default async function AlertsPage() {
   return (
     <div className="flex-1 flex flex-col">
       <div className="flex items-center gap-3 px-5 pt-[18px] pb-3.5">
-        <Link href="/" aria-label="뒤로">
+        <Link href="/" aria-label="戻る">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </Link>
-        <span className="text-[16.5px] font-bold">잔여·미수 알림</span>
+        <span className="text-[16.5px] font-bold">残り回数・未払い通知</span>
       </div>
 
       <div className="flex-1 overflow-auto px-5 pb-6">
         {alerts.length === 0 ? (
           <p className="text-center text-[13px] text-ink-mid py-16">
-            잔여 임박·외상 학생이 없어요.
+            残り回数が少ない・未払いの生徒はいません。
           </p>
         ) : (
           <div className="flex flex-col gap-3">
@@ -37,7 +37,7 @@ export default async function AlertsPage() {
                       a.kind === "overdue" ? "bg-critical-soft text-critical" : "bg-warn-soft text-warn"
                     }`}
                   >
-                    {a.kind === "overdue" ? `외상 ${-a.remaining_sessions}회` : `잔여 ${a.remaining_sessions}회`}
+                    {a.kind === "overdue" ? `未払い${-a.remaining_sessions}回` : `残り${a.remaining_sessions}回`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2.5">
@@ -46,11 +46,11 @@ export default async function AlertsPage() {
                     href={`/students/${a.student_id}/charge`}
                     className="flex-1 h-11 rounded-lg bg-critical text-white text-[13px] font-bold flex items-center justify-center"
                   >
-                    회차 충전
+                    回数チャージ
                   </Link>
                 </div>
                 {a.notified && (
-                  <p className="text-[11px] text-ink-mid">이미 알림을 보낸 적이 있어요.</p>
+                  <p className="text-[11px] text-ink-mid">すでに通知を送信したことがあります。</p>
                 )}
               </div>
             ))}

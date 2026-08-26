@@ -18,7 +18,7 @@ export async function createStaff(
 ): Promise<StaffFormState> {
   const session = await getSession();
   if (!session || session.role !== "owner") {
-    return { error: "원장만 선생님 계정을 추가할 수 있습니다." };
+    return { error: "教室長のみ先生アカウントを追加できます。" };
   }
 
   const name = String(formData.get("name") || "").trim();
@@ -27,13 +27,13 @@ export async function createStaff(
   const email = String(formData.get("email") || "").trim() || null;
   const password = String(formData.get("password") || "");
 
-  if (!name) return { error: "이름을 입력해주세요." };
-  if (!phone) return { error: "전화번호를 입력해주세요." };
-  if (!["owner", "teacher"].includes(role)) return { error: "역할을 확인해주세요." };
-  if (password.length < 4) return { error: "비밀번호는 4자 이상이어야 합니다." };
+  if (!name) return { error: "名前を入力してください。" };
+  if (!phone) return { error: "電話番号を入力してください。" };
+  if (!["owner", "teacher"].includes(role)) return { error: "役割をご確認ください。" };
+  if (password.length < 4) return { error: "パスワードは4文字以上にしてください。" };
 
   const [dup] = await sql<{ id: string }[]>`select id from staff where phone = ${phone}`;
-  if (dup) return { error: "이미 등록된 전화번호입니다." };
+  if (dup) return { error: "すでに登録されている電話番号です。" };
 
   const passwordHash = await bcrypt.hash(password, 10);
 
@@ -53,7 +53,7 @@ export async function updateStaff(
 ): Promise<StaffFormState> {
   const session = await getSession();
   if (!session || session.role !== "owner") {
-    return { error: "원장만 선생님 계정을 수정할 수 있습니다." };
+    return { error: "教室長のみ先生アカウントを編集できます。" };
   }
 
   const name = String(formData.get("name") || "").trim();
@@ -63,15 +63,15 @@ export async function updateStaff(
   const password = String(formData.get("password") || "");
   const isActive = formData.get("isActive") === "on";
 
-  if (!name) return { error: "이름을 입력해주세요." };
-  if (!phone) return { error: "전화번호를 입력해주세요." };
-  if (!["owner", "teacher"].includes(role)) return { error: "역할을 확인해주세요." };
-  if (password && password.length < 4) return { error: "비밀번호는 4자 이상이어야 합니다." };
+  if (!name) return { error: "名前を入力してください。" };
+  if (!phone) return { error: "電話番号を入力してください。" };
+  if (!["owner", "teacher"].includes(role)) return { error: "役割をご確認ください。" };
+  if (password && password.length < 4) return { error: "パスワードは4文字以上にしてください。" };
 
   const [dup] = await sql<{ id: string }[]>`
     select id from staff where phone = ${phone} and id != ${staffId}
   `;
-  if (dup) return { error: "이미 등록된 전화번호입니다." };
+  if (dup) return { error: "すでに登録されている電話番号です。" };
 
   if (password) {
     const passwordHash = await bcrypt.hash(password, 10);

@@ -2,19 +2,19 @@ import Link from "next/link";
 import { getUnpaidCandidates, getLowBalanceStudents } from "@/lib/director-queries";
 
 const TABS = [
-  { key: "all", label: "전체 미수" },
-  { key: "no_active_pass", label: "무결제" },
-  { key: "overdue", label: "외상" },
-  { key: "low_balance", label: "잔여 임박" },
+  { key: "all", label: "全ての未払い" },
+  { key: "no_active_pass", label: "未決済" },
+  { key: "overdue", label: "未払い" },
+  { key: "low_balance", label: "残り回数少" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
 
 function reasonBadge(reason: "no_active_pass" | "overdue") {
   if (reason === "no_active_pass") {
-    return { label: "무결제", className: "bg-surface text-ink-mid" };
+    return { label: "未決済", className: "bg-surface text-ink-mid" };
   }
-  return { label: "외상", className: "bg-critical-soft text-critical" };
+  return { label: "未払い", className: "bg-critical-soft text-critical" };
 }
 
 export default async function UnpaidManagementPage({
@@ -38,9 +38,9 @@ export default async function UnpaidManagementPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-[22px] font-bold">미수·알림 현황</h1>
+        <h1 className="text-[22px] font-bold">未払い・通知状況</h1>
         <p className="text-[13px] text-ink-mid mt-1">
-          결제가 필요한 학생과 잔여 회차 임박 학생을 한 곳에서 확인해요.
+          支払いが必要な生徒と残り回数が少ない生徒を一箇所で確認できます。
         </p>
       </div>
 
@@ -68,10 +68,10 @@ export default async function UnpaidManagementPage({
           <table className="w-full text-[13px]">
             <thead>
               <tr className="border-b border-line-light text-left text-ink-mid text-[12px]">
-                <th className="px-5 py-3 font-semibold">이름</th>
-                <th className="px-5 py-3 font-semibold">전화번호</th>
-                <th className="px-5 py-3 font-semibold">잔여 회차</th>
-                <th className="px-5 py-3 font-semibold">알림 발송</th>
+                <th className="px-5 py-3 font-semibold">名前</th>
+                <th className="px-5 py-3 font-semibold">電話番号</th>
+                <th className="px-5 py-3 font-semibold">残り回数</th>
+                <th className="px-5 py-3 font-semibold">通知送信</th>
                 <th className="px-5 py-3 font-semibold"></th>
               </tr>
             </thead>
@@ -79,7 +79,7 @@ export default async function UnpaidManagementPage({
               {lowBalance.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-5 py-10 text-center text-ink-mid">
-                    잔여 회차가 임박한 학생이 없어요.
+                    残り回数が少ない生徒はいません。
                   </td>
                 </tr>
               )}
@@ -89,15 +89,21 @@ export default async function UnpaidManagementPage({
                   <td className="px-5 py-3.5 font-mono text-ink-mid">{row.phone ?? "-"}</td>
                   <td className="px-5 py-3.5">
                     <span className="rounded-full bg-warn-soft text-warn px-2.5 py-0.5 text-[11.5px] font-bold">
-                      잔여 {row.remaining_sessions}회
+                      残り{row.remaining_sessions}回
                     </span>
                   </td>
                   <td className="px-5 py-3.5 text-ink-mid">
-                    {row.notified_low_balance ? "발송됨" : "미발송"}
+                    {row.notified_low_balance ? "送信済み" : "未送信"}
                   </td>
-                  <td className="px-5 py-3.5 text-right">
+                  <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                    <Link
+                      href={`/students/${row.student_id}/charge`}
+                      className="text-critical font-semibold mr-3"
+                    >
+                      チャージ
+                    </Link>
                     <Link href={`/students/${row.student_id}`} className="text-accent font-semibold">
-                      학생 상세 →
+                      生徒詳細 →
                     </Link>
                   </td>
                 </tr>
@@ -110,10 +116,10 @@ export default async function UnpaidManagementPage({
           <table className="w-full text-[13px]">
             <thead>
               <tr className="border-b border-line-light text-left text-ink-mid text-[12px]">
-                <th className="px-5 py-3 font-semibold">이름</th>
-                <th className="px-5 py-3 font-semibold">전화번호</th>
-                <th className="px-5 py-3 font-semibold">사유</th>
-                <th className="px-5 py-3 font-semibold">미수 회차</th>
+                <th className="px-5 py-3 font-semibold">名前</th>
+                <th className="px-5 py-3 font-semibold">電話番号</th>
+                <th className="px-5 py-3 font-semibold">理由</th>
+                <th className="px-5 py-3 font-semibold">未払い回数</th>
                 <th className="px-5 py-3 font-semibold"></th>
               </tr>
             </thead>
@@ -121,7 +127,7 @@ export default async function UnpaidManagementPage({
               {filteredUnpaid.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-5 py-10 text-center text-ink-mid">
-                    해당하는 학생이 없어요.
+                    該当する生徒はいません。
                   </td>
                 </tr>
               )}
@@ -137,11 +143,17 @@ export default async function UnpaidManagementPage({
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      {row.owed_sessions !== null ? `${row.owed_sessions}회` : "-"}
+                      {row.owed_sessions !== null ? `${row.owed_sessions}回` : "-"}
                     </td>
-                    <td className="px-5 py-3.5 text-right">
+                    <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                      <Link
+                        href={`/students/${row.student_id}/charge`}
+                        className="text-critical font-semibold mr-3"
+                      >
+                        チャージ（未払い解消）
+                      </Link>
                       <Link href={`/students/${row.student_id}`} className="text-accent font-semibold">
-                        학생 상세 →
+                        生徒詳細 →
                       </Link>
                     </td>
                   </tr>

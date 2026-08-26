@@ -6,23 +6,23 @@ import { markAttendance } from "@/lib/actions/attendance-actions";
 import type { AttendanceStatus, RosterRow } from "@/lib/types";
 
 const STATUS_LABEL: Record<AttendanceStatus, string> = {
-  present: "출석",
-  absent: "결석",
-  makeup_scheduled: "보강",
-  excused: "사유결석",
+  present: "出席",
+  absent: "欠席",
+  makeup_scheduled: "振替",
+  excused: "公欠",
 };
 
 function balanceChip(remaining: number | null) {
   if (remaining === null) {
-    return { label: "수강권 없음", className: "bg-surface text-ink-mid" };
+    return { label: "受講パスなし", className: "bg-surface text-ink-mid" };
   }
   if (remaining <= 0) {
-    return { label: `${remaining}회 외상`, className: "bg-critical-soft text-critical" };
+    return { label: `${remaining}回分未払い`, className: "bg-critical-soft text-critical" };
   }
   if (remaining <= 2) {
-    return { label: `잔여 ${remaining}회`, className: "bg-warn-soft text-warn" };
+    return { label: `残り${remaining}回`, className: "bg-warn-soft text-warn" };
   }
-  return { label: `잔여 ${remaining}회`, className: "bg-surface text-ink-mid" };
+  return { label: `残り${remaining}回`, className: "bg-surface text-ink-mid" };
 }
 
 function statusButtonClass(active: boolean, status: AttendanceStatus) {
@@ -129,12 +129,12 @@ export function AttendanceRoster({
               {rowError?.studentId === row.student_id && (
                 <p className="mt-2 text-[12px] text-critical flex items-center justify-between gap-2">
                   {rowError.message}
-                  {rowError.message.includes("회차 충전") && (
+                  {rowError.message.includes("回数チャージ") && (
                     <Link
                       href={`/students/${row.student_id}/charge`}
                       className="underline shrink-0 font-semibold"
                     >
-                      회차 충전하러 가기
+                      回数チャージへ
                     </Link>
                   )}
                 </p>
@@ -146,11 +146,11 @@ export function AttendanceRoster({
 
       <div className="flex items-center justify-between border-t border-line-light px-5 py-3.5">
         <p className="text-[12.5px] text-ink-mid">
-          {roster.length}명 중 <span className="text-ink font-bold">{checkedCount}명</span> 체크
-          완료
+          {roster.length}名中 <span className="text-ink font-bold">{checkedCount}名</span> チェック
+          完了
         </p>
         <Link href="/" className="text-[13px] text-accent font-bold">
-          홈으로
+          ホームへ
         </Link>
       </div>
 
@@ -163,20 +163,20 @@ export function AttendanceRoster({
           <div className="relative w-full max-w-md bg-white rounded-t-[20px] shadow-[0_-8px_24px_rgba(0,0,0,0.12)] px-[22px] pt-3 pb-6 flex flex-col gap-4">
             <div className="w-9 h-1 rounded-full bg-line mx-auto" />
             <div className="flex flex-col gap-1.5">
-              <h2 className="text-[15.5px] font-bold">외상으로 출석 처리할까요?</h2>
+              <h2 className="text-[15.5px] font-bold">未払いのまま出席処理しますか？</h2>
               <p className="text-[13px] text-ink-mid leading-relaxed">
-                {confirmTarget.name} 학생은 잔여 회차가{" "}
-                {confirmTarget.remaining_sessions === 0 ? "없어요" : "부족해요"}. 이대로 처리하면{" "}
+                {confirmTarget.name}さんは受講回数が
+                {confirmTarget.remaining_sessions === 0 ? "残っていません" : "不足しています"}。このまま処理すると
                 <span className="text-critical font-bold">
-                  {(confirmTarget.remaining_sessions ?? 0) - 1}회 외상
+                  {(confirmTarget.remaining_sessions ?? 0) - 1}回分未払い
                 </span>
-                으로 기록됩니다.
+                として記録されます。
               </p>
             </div>
             <textarea
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
-              placeholder="메모 (선택) · 예: 다음 주 화요일 결제 예정"
+              placeholder="メモ（任意）・例：来週火曜日に支払い予定"
               rows={2}
               className="border border-line-light rounded-[10px] px-3.5 py-3 text-[12.5px] outline-none focus:border-accent resize-none"
             />
@@ -186,7 +186,7 @@ export function AttendanceRoster({
                 onClick={() => setConfirmTarget(null)}
                 className="flex-1 h-[46px] rounded-lg border border-line text-[14px] font-bold"
               >
-                취소
+                キャンセル
               </button>
               <button
                 type="button"
@@ -200,7 +200,7 @@ export function AttendanceRoster({
                 }}
                 className="flex-[1.4] h-[46px] rounded-lg bg-critical text-white text-[14px] font-bold"
               >
-                외상으로 출석 처리
+                未払いのまま出席処理
               </button>
             </div>
           </div>

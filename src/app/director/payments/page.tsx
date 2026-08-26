@@ -2,18 +2,18 @@ import Link from "next/link";
 import { getRecentPayments } from "@/lib/director-queries";
 
 const METHOD_LABEL: Record<string, string> = {
-  cash: "현금",
-  bank_transfer: "계좌이체",
-  card: "카드",
-  other: "기타",
+  cash: "現金",
+  bank_transfer: "口座振込",
+  card: "カード",
+  other: "その他",
 };
 
 function fmtWon(n: number) {
-  return n.toLocaleString("ko-KR") + "원";
+  return n.toLocaleString("ja-JP") + "ウォン";
 }
 
 function fmtDate(d: string | Date) {
-  return new Date(d).toLocaleDateString("ko-KR", {
+  return new Date(d).toLocaleDateString("ja-JP", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -29,9 +29,9 @@ export default async function PaymentsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-[22px] font-bold">결제 내역</h1>
+        <h1 className="text-[22px] font-bold">支払い履歴</h1>
         <p className="text-[13px] text-ink-mid mt-1">
-          선생님이 학생 상세 화면에서 등록한 회차 충전 내역이에요. 오늘 결제 합계{" "}
+          先生が生徒詳細画面で登録した回数チャージの履歴です。本日の支払い合計{" "}
           <span className="font-bold text-ink">{fmtWon(todayTotal)}</span>
         </p>
       </div>
@@ -40,12 +40,12 @@ export default async function PaymentsPage() {
         <table className="w-full text-[13px]">
           <thead>
             <tr className="border-b border-line-light text-left text-ink-mid text-[12px]">
-              <th className="px-5 py-3 font-semibold">결제일</th>
-              <th className="px-5 py-3 font-semibold">학생</th>
-              <th className="px-5 py-3 font-semibold">상품</th>
-              <th className="px-5 py-3 font-semibold">결제수단</th>
-              <th className="px-5 py-3 font-semibold">금액</th>
-              <th className="px-5 py-3 font-semibold">충전 후 잔여</th>
+              <th className="px-5 py-3 font-semibold">支払日</th>
+              <th className="px-5 py-3 font-semibold">生徒</th>
+              <th className="px-5 py-3 font-semibold">商品</th>
+              <th className="px-5 py-3 font-semibold">支払い方法</th>
+              <th className="px-5 py-3 font-semibold">金額</th>
+              <th className="px-5 py-3 font-semibold">チャージ後の残り</th>
               <th className="px-5 py-3 font-semibold"></th>
             </tr>
           </thead>
@@ -53,7 +53,7 @@ export default async function PaymentsPage() {
             {payments.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-5 py-10 text-center text-ink-mid">
-                  결제 내역이 없어요.
+                  支払い履歴がありません。
                 </td>
               </tr>
             )}
@@ -68,10 +68,10 @@ export default async function PaymentsPage() {
                   </span>
                 </td>
                 <td className="px-5 py-3.5 font-mono font-semibold">{fmtWon(p.price)}</td>
-                <td className="px-5 py-3.5 font-mono">{p.remaining_sessions}회</td>
+                <td className="px-5 py-3.5 font-mono">{p.remaining_sessions}回</td>
                 <td className="px-5 py-3.5 text-right">
                   <Link href={`/students/${p.student_id}`} className="text-accent font-semibold">
-                    학생 상세 →
+                    生徒詳細 →
                   </Link>
                 </td>
               </tr>

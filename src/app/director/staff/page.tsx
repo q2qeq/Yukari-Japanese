@@ -8,14 +8,14 @@ export default async function StaffListPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-bold">선생님 관리</h1>
-          <p className="text-[13px] text-ink-mid mt-1">원장/선생님 계정 {staff.length}명</p>
+          <h1 className="text-[22px] font-bold">先生管理</h1>
+          <p className="text-[13px] text-ink-mid mt-1">教室長/先生アカウント{staff.length}名</p>
         </div>
         <Link
           href="/director/staff/new"
           className="rounded-lg bg-accent text-white text-[13.5px] font-semibold px-4 py-2.5"
         >
-          + 선생님 추가
+          + 先生を追加
         </Link>
       </div>
 
@@ -23,22 +23,26 @@ export default async function StaffListPage() {
         <table className="w-full text-[13px]">
           <thead>
             <tr className="border-b border-line-light text-left text-ink-mid text-[12px]">
-              <th className="px-5 py-3 font-semibold">이름</th>
-              <th className="px-5 py-3 font-semibold">역할</th>
-              <th className="px-5 py-3 font-semibold">전화번호</th>
-              <th className="px-5 py-3 font-semibold">담당 반/학생</th>
-              <th className="px-5 py-3 font-semibold">상태</th>
+              <th className="px-5 py-3 font-semibold">名前</th>
+              <th className="px-5 py-3 font-semibold">役割</th>
+              <th className="px-5 py-3 font-semibold">電話番号</th>
+              <th className="px-5 py-3 font-semibold">担当クラス/生徒</th>
+              <th className="px-5 py-3 font-semibold">ステータス</th>
               <th className="px-5 py-3 font-semibold"></th>
             </tr>
           </thead>
           <tbody>
             {staff.map((s) => (
               <tr key={s.id} className="border-b border-line-light last:border-none">
-                <td className="px-5 py-3.5 font-semibold">{s.name}</td>
-                <td className="px-5 py-3.5">{s.role === "owner" ? "원장" : "선생님"}</td>
+                <td className="px-5 py-3.5 font-semibold">
+                  <Link href={`/director/staff/${s.id}`} className="hover:text-accent">
+                    {s.name}
+                  </Link>
+                </td>
+                <td className="px-5 py-3.5">{s.role === "owner" ? "教室長" : "先生"}</td>
                 <td className="px-5 py-3.5 font-mono text-ink-mid">{s.phone}</td>
                 <td className="px-5 py-3.5 text-ink-mid">
-                  반 {s.class_count}개 · 학생 {s.student_count}명
+                  クラス{s.class_count}件 ・生徒{s.student_count}名
                 </td>
                 <td className="px-5 py-3.5">
                   <span
@@ -46,12 +50,15 @@ export default async function StaffListPage() {
                       s.is_active ? "bg-good-soft text-good" : "bg-surface text-ink-mid"
                     }`}
                   >
-                    {s.is_active ? "활성" : "비활성"}
+                    {s.is_active ? "有効" : "無効"}
                   </span>
                 </td>
-                <td className="px-5 py-3.5 text-right">
-                  <Link href={`/director/staff/${s.id}/edit`} className="text-accent font-semibold">
-                    수정
+                <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                  <Link href={`/director/staff/${s.id}`} className="text-accent font-semibold mr-3">
+                    詳細
+                  </Link>
+                  <Link href={`/director/staff/${s.id}/edit`} className="text-ink-mid font-semibold">
+                    編集
                   </Link>
                 </td>
               </tr>

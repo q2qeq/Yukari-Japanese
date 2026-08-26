@@ -16,9 +16,9 @@ const TEMPLATE_BY_KIND = {
 
 function buildMessage(kind: "low_balance" | "payment_overdue", studentName: string, remaining: number) {
   if (kind === "low_balance") {
-    return `[미도리 일본어학원] ${studentName} 학생, 수강권 잔여 회차가 ${remaining}회 남았어요. 다음 방문 시 회차 충전을 안내해주세요.`;
+    return `[ゆかり日本語教室] ${studentName}さん、受講パスの残り回数があと${remaining}回になりました。次回ご来校時に回数チャージのご案内をお願いします。`;
   }
-  return `[미도리 일본어학원] ${studentName} 학생, 결제가 필요해요 (현재 ${-remaining}회 외상). 다음 방문 시 결제를 안내해주세요.`;
+  return `[ゆかり日本語教室] ${studentName}さん、お支払いが必要です(現在${-remaining}回分未払い)。次回ご来校時にお支払いのご案内をお願いします。`;
 }
 
 /**
@@ -31,18 +31,18 @@ export async function sendBalanceNotification(
   kind: "low_balance" | "payment_overdue",
 ): Promise<ActionResult> {
   const session = await getSession();
-  if (!session) return { ok: false, error: "로그인이 필요합니다." };
+  if (!session) return { ok: false, error: "ログインが必要です。" };
 
   const [student] = await sql<
     { id: string; name: string; phone: string | null; guardian_phone: string | null }[]
   >`select id, name, phone, guardian_phone from students where id = ${studentId}`;
-  if (!student) return { ok: false, error: "학생 정보를 찾을 수 없습니다." };
+  if (!student) return { ok: false, error: "生徒情報が見つかりません。" };
 
   const [pass] = await sql<{ id: string; remaining_sessions: number }[]>`
     select id, remaining_sessions from payment_passes
     where student_id = ${studentId} and status = 'active'
   `;
-  if (!pass) return { ok: false, error: "활성 수강권이 없습니다." };
+  if (!pass) return { ok: false, error: "有効な受講パスがありません。" };
 
   const content = buildMessage(kind, student.name, pass.remaining_sessions);
   const recipientPhone = student.guardian_phone || student.phone;
@@ -66,7 +66,7 @@ export async function sendBalanceNotification(
 
   if (!sendResult.ok) {
     revalidatePath(`/students/${studentId}`);
-    return { ok: false, error: sendResult.error ?? "발송에 실패했습니다." };
+    return { ok: false, error: sendResult.error ?? "送信に失敗しました。" };
   }
 
   if (kind === "low_balance") {
@@ -84,7 +84,7 @@ export async function sendBalanceNotification(
     status: sendResult.status as "sent" | "pending",
     message:
       sendResult.status === "sent"
-        ? "카카오 알림톡을 발송했습니다."
-        : sendResult.error ?? "카카오 연동 전이라 기록만 저장했습니다.",
+        ? "カカオ通知メッセージを送信しました。"
+        : sendResult.error ?? "カカオ連携前のため記録のみ保存しました。",
   };
 }

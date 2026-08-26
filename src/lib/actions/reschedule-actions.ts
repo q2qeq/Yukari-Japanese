@@ -17,14 +17,14 @@ export async function createRescheduleRequest(
   formData: FormData,
 ): Promise<CreateRescheduleState> {
   const session = await getSession();
-  if (!session) return { error: "로그인이 필요합니다." };
+  if (!session) return { error: "ログインが必要です。" };
 
   const studentId = String(formData.get("studentId") || "");
   const classSessionId = String(formData.get("classSessionId") || "");
   const reason = String(formData.get("reason") || "").trim();
 
   if (!studentId || !classSessionId) {
-    return { error: "연기할 수업을 선택해주세요." };
+    return { error: "延期する授業を選択してください。" };
   }
 
   const [dup] = await sql<{ id: string }[]>`
@@ -33,7 +33,7 @@ export async function createRescheduleRequest(
       and status in ('pending', 'scheduled')
   `;
   if (dup) {
-    return { error: "이미 이 수업에 대한 연기 요청이 있습니다." };
+    return { error: "すでにこの授業について延期リクエストがあります。" };
   }
 
   await sql`
@@ -62,13 +62,13 @@ export async function scheduleMakeup(
   endTime: string,
 ): Promise<ActionResult> {
   const session = await getSession();
-  if (!session) return { ok: false, error: "로그인이 필요합니다." };
+  if (!session) return { ok: false, error: "ログインが必要です。" };
 
   if (!date || !startTime || !endTime) {
-    return { ok: false, error: "보강 날짜와 시간을 입력해주세요." };
+    return { ok: false, error: "振替の日付と時間を入力してください。" };
   }
   if (startTime >= endTime) {
-    return { ok: false, error: "종료 시간은 시작 시간보다 늦어야 합니다." };
+    return { ok: false, error: "終了時間は開始時間より後にしてください。" };
   }
 
   try {
@@ -80,14 +80,14 @@ export async function scheduleMakeup(
         where id = ${requestId}
         for update
       `;
-      if (!request) throw new Error("요청을 찾을 수 없습니다.");
-      if (request.status !== "pending") throw new Error("이미 처리된 요청입니다.");
-      if (!request.student_id) throw new Error("이 요청은 개별 학생 보강 대상이 아닙니다.");
+      if (!request) throw new Error("リクエストが見つかりません。");
+      if (request.status !== "pending") throw new Error("すでに処理済みのリクエストです。");
+      if (!request.student_id) throw new Error("このリクエストは個別生徒の振替対象ではありません。");
 
       const [original] = await tx<{ class_id: string; teacher_id: string }[]>`
         select class_id, teacher_id from class_sessions where id = ${request.class_session_id}
       `;
-      if (!original) throw new Error("원본 수업 정보를 찾을 수 없습니다.");
+      if (!original) throw new Error("元の授業情報が見つかりません。");
 
       const [makeup] = await tx<{ id: string }[]>`
         insert into class_sessions (class_id, session_date, start_time, end_time, teacher_id, status, is_makeup, original_session_id)
@@ -99,7 +99,7 @@ export async function scheduleMakeup(
         insert into attendance (class_session_id, student_id, status, checked_by, checked_at, memo)
         values (
           ${request.class_session_id}, ${request.student_id}, 'makeup_scheduled', ${session.staffId}, now(),
-          ${"보강 배정: " + date + " " + startTime.slice(0, 5)}
+          ${"振替割当：" + date + " " + startTime.slice(0, 5)}
         )
         on conflict (class_session_id, student_id)
         do update set status = 'makeup_scheduled', checked_by = excluded.checked_by,
@@ -114,7 +114,7 @@ export async function scheduleMakeup(
     });
   } catch (err) {
     console.error("scheduleMakeup failed", err);
-    const message = err instanceof Error ? err.message : "처리 중 문제가 발생했습니다.";
+    const message = err instanceof Error ? err.message : "処理中に問題が発生しました。";
     return { ok: false, error: message };
   }
 
@@ -125,7 +125,7 @@ export async function scheduleMakeup(
 
 export async function cancelRescheduleRequest(requestId: string): Promise<ActionResult> {
   const session = await getSession();
-  if (!session) return { ok: false, error: "로그인이 필요합니다." };
+  if (!session) return { ok: false, error: "ログインが必要です。" };
 
   const rows = await sql<{ status: string }[]>`
     update reschedule_requests set status = 'canceled'
@@ -133,7 +133,7 @@ export async function cancelRescheduleRequest(requestId: string): Promise<Action
     returning status
   `;
   if (rows.length === 0) {
-    return { ok: false, error: "대기중인 요청만 취소할 수 있습니다." };
+    return { ok: false, error: "保留中のリクエストのみキャンセルできます。" };
   }
 
   revalidatePath("/reschedule");

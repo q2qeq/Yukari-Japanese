@@ -16,7 +16,7 @@ export default async function DirectorEditStudentPage({
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
-      <h1 className="text-[22px] font-bold">학생 정보 수정</h1>
+      <h1 className="text-[22px] font-bold">生徒情報編集</h1>
       <StudentForm
         mode="edit"
         studentId={studentId}

@@ -41,9 +41,9 @@ function readStudentFields(formData: FormData) {
 }
 
 function validate(f: ReturnType<typeof readStudentFields>): string | null {
-  if (!f.name) return "이름을 입력해주세요.";
-  if (f.isMinor && !f.guardianPhone) return "미성년 학생은 보호자 연락처가 필수입니다.";
-  if (!["active", "paused", "withdrawn"].includes(f.status)) return "상태 값을 확인해주세요.";
+  if (!f.name) return "名前を入力してください。";
+  if (f.isMinor && !f.guardianPhone) return "未成年の生徒は保護者の連絡先が必須です。";
+  if (!["active", "paused", "withdrawn"].includes(f.status)) return "ステータスをご確認ください。";
   return null;
 }
 
@@ -52,7 +52,7 @@ export async function createStudent(
   formData: FormData,
 ): Promise<StudentFormState> {
   const session = await getSession();
-  if (!session) return { error: "로그인이 필요합니다." };
+  if (!session) return { error: "ログインが必要です。" };
 
   const f = readStudentFields(formData);
   const err = validate(f);
@@ -80,7 +80,7 @@ export async function updateStudent(
   formData: FormData,
 ): Promise<StudentFormState> {
   const session = await getSession();
-  if (!session) return { error: "로그인이 필요합니다." };
+  if (!session) return { error: "ログインが必要です。" };
 
   const f = readStudentFields(formData);
   const err = validate(f);

@@ -13,7 +13,7 @@ export function LoginForm() {
     <form action={formAction} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
         <label htmlFor="phone" className="text-xs font-semibold text-ink-mid">
-          전화번호
+          電話番号
         </label>
         <input
           id="phone"
@@ -27,7 +27,7 @@ export function LoginForm() {
       </div>
       <div className="flex flex-col gap-1.5">
         <label htmlFor="password" className="text-xs font-semibold text-ink-mid">
-          비밀번호
+          パスワード
         </label>
         <input
           id="password"
@@ -50,7 +50,7 @@ export function LoginForm() {
         disabled={pending}
         className="h-12 rounded-lg bg-accent text-white text-[15px] font-semibold disabled:opacity-60"
       >
-        {pending ? "로그인 중..." : "로그인"}
+        {pending ? "ログイン中..." : "ログイン"}
       </button>
     </form>
   );

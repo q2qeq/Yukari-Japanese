@@ -9,25 +9,25 @@ import {
 import type { ConsultationRow } from "@/lib/director-queries";
 
 const COLUMNS: { key: ConsultationStatus; label: string }[] = [
-  { key: "new", label: "신규" },
-  { key: "contacted", label: "연락함" },
-  { key: "trial_scheduled", label: "체험 예정" },
-  { key: "converted", label: "등록 완료" },
-  { key: "lost", label: "이탈" },
+  { key: "new", label: "新規" },
+  { key: "contacted", label: "連絡済み" },
+  { key: "trial_scheduled", label: "体験予定" },
+  { key: "converted", label: "登録完了" },
+  { key: "lost", label: "離脱" },
 ];
 
 const SOURCE_LABEL: Record<string, string> = {
-  kakao_channel: "카카오 채널",
-  phone: "전화",
-  walk_in: "방문",
-  referral: "지인 소개",
-  online_form: "온라인 폼",
-  other: "기타",
+  kakao_channel: "カカオチャンネル",
+  phone: "電話",
+  walk_in: "来校",
+  referral: "紹介",
+  online_form: "オンラインフォーム",
+  other: "その他",
 };
 
 function fmtDate(d: string | Date | null) {
   if (!d) return null;
-  return new Date(d).toLocaleDateString("ko-KR", { month: "2-digit", day: "2-digit" });
+  return new Date(d).toLocaleDateString("ja-JP", { month: "2-digit", day: "2-digit" });
 }
 
 // DB의 date 컬럼은 서버->클라이언트 경계를 넘으며 실제로는 Date 인스턴스로
@@ -79,7 +79,7 @@ function ConsultationCard({
       </div>
 
       {row.interested_level && (
-        <span className="text-[11.5px] text-ink-mid">관심: {row.interested_level}</span>
+        <span className="text-[11.5px] text-ink-mid">興味：{row.interested_level}</span>
       )}
 
       {row.follow_up_at && (
@@ -88,7 +88,7 @@ function ConsultationCard({
             isDueToday ? "bg-warn-soft text-warn" : "bg-surface text-ink-mid"
           }`}
         >
-          후속 연락 {fmtDate(row.follow_up_at)}
+          フォローアップ {fmtDate(row.follow_up_at)}
         </span>
       )}
 
@@ -102,7 +102,7 @@ function ConsultationCard({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
-            placeholder="메모"
+            placeholder="メモ"
             className="rounded-lg border border-line-light px-2.5 py-2 text-[12px] outline-none focus:border-accent resize-none"
           />
           <input
@@ -117,7 +117,7 @@ function ConsultationCard({
               onClick={() => setExpanded(false)}
               className="flex-1 h-8 rounded-lg border border-line text-[11.5px] font-semibold"
             >
-              취소
+              キャンセル
             </button>
             <button
               type="button"
@@ -125,7 +125,7 @@ function ConsultationCard({
               disabled={saving}
               className="flex-1 h-8 rounded-lg bg-ink text-white text-[11.5px] font-semibold disabled:opacity-60"
             >
-              {saving ? "저장 중..." : "저장"}
+              {saving ? "保存中..." : "保存"}
             </button>
           </div>
         </div>
@@ -137,7 +137,7 @@ function ConsultationCard({
           onClick={() => setExpanded((v) => !v)}
           className="text-[11px] text-ink-mid font-semibold"
         >
-          {expanded ? "닫기" : "메모/후속일 편집"}
+          {expanded ? "閉じる" : "メモ/フォローアップ日を編集"}
         </button>
         <div className="flex gap-1">
           {currentIdx > 0 && row.status !== "lost" && row.status !== "converted" && (
@@ -145,7 +145,7 @@ function ConsultationCard({
               type="button"
               onClick={() => onStatusChange(COLUMNS[currentIdx - 1].key)}
               className="w-6 h-6 rounded-md border border-line text-[11px] flex items-center justify-center"
-              title="이전 단계로"
+              title="前の段階へ"
             >
               ←
             </button>
@@ -155,7 +155,7 @@ function ConsultationCard({
               type="button"
               onClick={() => onStatusChange(COLUMNS[currentIdx + 1].key)}
               className="w-6 h-6 rounded-md border border-line text-[11px] flex items-center justify-center"
-              title="다음 단계로"
+              title="次の段階へ"
             >
               →
             </button>
@@ -165,9 +165,9 @@ function ConsultationCard({
               type="button"
               onClick={() => onStatusChange("lost")}
               className="rounded-md border border-line text-[10.5px] px-1.5 h-6 text-ink-mid"
-              title="이탈 처리"
+              title="離脱として処理"
             >
-              이탈
+              離脱
             </button>
           )}
         </div>

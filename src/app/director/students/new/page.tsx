@@ -6,7 +6,7 @@ export default async function DirectorNewStudentPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
-      <h1 className="text-[22px] font-bold">학생 추가</h1>
+      <h1 className="text-[22px] font-bold">生徒を追加</h1>
       <StudentForm mode="create" teachers={teachers} returnTo="/director/students" />
     </div>
   );

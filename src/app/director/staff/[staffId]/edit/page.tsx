@@ -13,7 +13,7 @@ export default async function EditStaffPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-[22px] font-bold">선생님 정보 수정</h1>
+      <h1 className="text-[22px] font-bold">先生情報編集</h1>
       <StaffForm mode="edit" staffId={staffId} initial={staff} />
     </div>
   );

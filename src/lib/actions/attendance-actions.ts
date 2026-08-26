@@ -25,7 +25,7 @@ export async function markAttendance(
 ): Promise<MarkAttendanceResult> {
   const session = await getSession();
   if (!session) {
-    return { ok: false, error: "로그인이 필요합니다.", code: "UNAUTHORIZED" };
+    return { ok: false, error: "ログインが必要です。", code: "UNAUTHORIZED" };
   }
 
   try {
@@ -67,7 +67,7 @@ export async function markAttendance(
           insert into pass_deductions (payment_pass_id, attendance_id, delta, reason, created_by)
           values (
             ${pass.id}, ${attendance.id}, -1,
-            ${memo ? `출석 체크 (메모: ${memo})` : "출석 체크"},
+            ${memo ? `出席チェック（メモ：${memo}）` : "出席チェック"},
             ${session.staffId}
           )
         `;
@@ -88,7 +88,7 @@ export async function markAttendance(
           `;
           await tx`
             insert into pass_deductions (payment_pass_id, attendance_id, delta, reason, created_by)
-            values (${pass.id}, ${attendance.id}, 1, '출석 상태 변경으로 인한 복구', ${session.staffId})
+            values (${pass.id}, ${attendance.id}, 1, '出席状況変更による復元', ${session.staffId})
           `;
           return updated.remaining_sessions;
         }
@@ -109,12 +109,12 @@ export async function markAttendance(
     if (err instanceof NoPassError) {
       return {
         ok: false,
-        error: "이 학생은 등록된 수강권이 없습니다. 먼저 회차 충전을 진행해주세요.",
+        error: "この生徒には登録された受講パスがありません。先に回数チャージを行ってください。",
         code: "NO_PASS",
       };
     }
     console.error("markAttendance failed", err);
-    return { ok: false, error: "처리 중 문제가 발생했습니다.", code: "UNKNOWN" };
+    return { ok: false, error: "処理中に問題が発生しました。", code: "UNKNOWN" };
   }
 }
 

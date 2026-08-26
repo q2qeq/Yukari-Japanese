@@ -1,7 +1,7 @@
 // 시간표 관련 순수 유틸. 서버/클라이언트 양쪽에서 그대로 쓸 수 있도록
 // "server-only" 의존성이 없는 파일로 분리합니다.
 
-export const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"] as const;
+export const DAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"] as const;
 
 // class_schedule_slots.day_of_week 체크 제약과 동일하게 0=일 ... 6=토.
 export const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // 월요일부터 보여주기 위한 순서

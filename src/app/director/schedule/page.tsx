@@ -7,8 +7,8 @@ export default async function DirectorSchedulePage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-[22px] font-bold">전체 시간표</h1>
-        <p className="text-[13px] text-ink-mid mt-1">모든 선생님의 반을 합쳐서 보여줘요.</p>
+        <h1 className="text-[22px] font-bold">全体時間割</h1>
+        <p className="text-[13px] text-ink-mid mt-1">全ての先生のクラスをまとめて表示します。</p>
       </div>
 
       <WeeklyScheduleGrid
@@ -25,7 +25,7 @@ export default async function DirectorSchedulePage() {
         }))}
         showTeacher
         showClassroom
-        emptyMessage="개설된 반이 없어요."
+        emptyMessage="開設されたクラスがありません。"
       />
     </div>
   );

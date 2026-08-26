@@ -218,6 +218,66 @@ export async function getTodayPaymentStats() {
   return row ?? { count: 0, total: 0 };
 }
 
+// ----------------------------------------------------------------------------
+// 선생님 상세 화면: 이 선생님이 담당하는 반과, 각 반에 등록된 학생 목록
+// (director/staff/[staffId] 조회 페이지에서 사용)
+// ----------------------------------------------------------------------------
+
+export type StaffClassRow = {
+  class_id: string;
+  class_name: string;
+  level: string | null;
+  classroom_name: string | null;
+};
+
+export async function getClassesForStaff(staffId: string) {
+  return sql<StaffClassRow[]>`
+    select c.id as class_id, c.name as class_name, c.level, cr.name as classroom_name
+    from classes c
+    left join classrooms cr on cr.id = c.classroom_id
+    where c.teacher_id = ${staffId} and c.status = 'active'
+    order by c.name
+  `;
+}
+
+export type StaffClassSlotRow = {
+  class_id: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+};
+
+export async function getScheduleSlotsForStaffClasses(staffId: string) {
+  return sql<StaffClassSlotRow[]>`
+    select slot.class_id, slot.day_of_week, slot.start_time, slot.end_time
+    from class_schedule_slots slot
+    join classes c on c.id = slot.class_id
+    where c.teacher_id = ${staffId} and c.status = 'active'
+    order by slot.day_of_week, slot.start_time
+  `;
+}
+
+export type StaffStudentRow = {
+  class_id: string;
+  student_id: string;
+  student_name: string;
+  remaining_sessions: number | null;
+};
+
+export async function getRosterForStaffClasses(staffId: string) {
+  return sql<StaffStudentRow[]>`
+    select
+      ce.class_id, s.id as student_id, s.name as student_name,
+      p.remaining_sessions
+    from class_enrollments ce
+    join classes c on c.id = ce.class_id
+    join students s on s.id = ce.student_id
+    left join payment_passes p on p.student_id = s.id and p.status = 'active'
+    where c.teacher_id = ${staffId} and ce.status = 'active' and c.status = 'active'
+    order by s.name
+  `;
+}
+
 export async function getDashboardCounts() {
   const [[unpaid], [lowBalance], [newConsult], [dueFollowUp]] = await Promise.all([
     sql<{ count: number }[]>`select count(*)::int as count from v_unpaid_candidates`,

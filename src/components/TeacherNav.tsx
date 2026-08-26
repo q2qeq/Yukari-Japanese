@@ -4,9 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
-  { href: "/", label: "홈" },
-  { href: "/students", label: "학생" },
-  { href: "/schedule", label: "시간표" },
+  { href: "/", label: "ホーム" },
+  { href: "/students", label: "生徒" },
+  { href: "/schedule", label: "時間割" },
+  { href: "/classrooms", label: "教室" },
 ];
 
 export function TeacherNav() {

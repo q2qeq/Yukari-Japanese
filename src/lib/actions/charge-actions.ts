@@ -18,7 +18,7 @@ export async function chargeSessions(
 ): Promise<ChargeState> {
   const session = await getSession();
   if (!session) {
-    return { error: "로그인이 필요합니다." };
+    return { error: "ログインが必要です。" };
   }
 
   const studentId = String(formData.get("studentId") || "");
@@ -26,15 +26,15 @@ export async function chargeSessions(
   const price = Number(formData.get("price"));
   const paymentMethod = String(formData.get("paymentMethod") || "cash");
 
-  if (!studentId) return { error: "학생 정보가 없습니다." };
+  if (!studentId) return { error: "生徒情報がありません。" };
   if (!Number.isInteger(sessionsToAdd) || sessionsToAdd <= 0) {
-    return { error: "충전 회차는 1 이상의 숫자여야 합니다." };
+    return { error: "チャージ回数は1以上の数字を入力してください。" };
   }
   if (!Number.isFinite(price) || price < 0) {
-    return { error: "결제 금액을 확인해주세요." };
+    return { error: "支払い金額をご確認ください。" };
   }
   if (!["cash", "bank_transfer", "card", "other"].includes(paymentMethod)) {
-    return { error: "결제 수단을 확인해주세요." };
+    return { error: "支払い方法をご確認ください。" };
   }
 
   await sql.begin(async (tx) => {
@@ -56,7 +56,7 @@ export async function chargeSessions(
         student_id, pass_name, total_sessions, remaining_sessions, price,
         payment_method, carried_from_pass_id, carried_sessions
       ) values (
-        ${studentId}, ${sessionsToAdd + "회권"}, ${sessionsToAdd}, ${newRemaining}, ${price},
+        ${studentId}, ${sessionsToAdd + "回券"}, ${sessionsToAdd}, ${newRemaining}, ${price},
         ${paymentMethod}, ${existing?.id ?? null}, ${carried}
       )
     `;

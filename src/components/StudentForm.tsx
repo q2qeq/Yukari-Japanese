@@ -9,9 +9,9 @@ import {
 import type { StudentEditData, TeacherOption } from "@/lib/queries";
 
 const STATUS_LABEL: Record<string, string> = {
-  active: "재원",
-  paused: "휴원",
-  withdrawn: "퇴원",
+  active: "在籍",
+  paused: "休会",
+  withdrawn: "退会",
 };
 
 export function StudentForm({
@@ -41,7 +41,7 @@ export function StudentForm({
       <input type="hidden" name="returnTo" value={returnTo} />
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-ink-mid">이름 *</label>
+        <label className="text-xs font-semibold text-ink-mid">名前 *</label>
         <input
           name="name"
           required
@@ -52,7 +52,7 @@ export function StudentForm({
 
       <div className="grid grid-cols-2 gap-3.5">
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-ink-mid">전화번호</label>
+          <label className="text-xs font-semibold text-ink-mid">電話番号</label>
           <input
             name="phone"
             type="tel"
@@ -62,22 +62,22 @@ export function StudentForm({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-ink-mid">레벨</label>
+          <label className="text-xs font-semibold text-ink-mid">レベル</label>
           <input
             name="level"
-            placeholder="예: 초급"
+            placeholder="例：初級"
             defaultValue={initial?.level ?? ""}
             className="h-11 rounded-lg border border-line px-3 text-[14px] outline-none focus:border-accent"
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-ink-mid">담당 선생님</label>
+          <label className="text-xs font-semibold text-ink-mid">担当の先生</label>
           <select
             name="primaryTeacherId"
             defaultValue={initial?.primary_teacher_id ?? ""}
             className="h-11 rounded-lg border border-line px-3 text-[14px] outline-none focus:border-accent bg-white"
           >
-            <option value="">미지정</option>
+            <option value="">未指定</option>
             {teachers.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.name}
@@ -86,7 +86,7 @@ export function StudentForm({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-ink-mid">상태</label>
+          <label className="text-xs font-semibold text-ink-mid">ステータス</label>
           <select
             name="status"
             defaultValue={initial?.status ?? "active"}
@@ -109,17 +109,17 @@ export function StudentForm({
             defaultChecked={initial?.is_minor}
             onChange={(e) => setIsMinor(e.target.checked)}
           />
-          미성년 학생 (보호자 연락처 필수)
+          未成年の生徒（保護者の連絡先が必須）
         </label>
         <label className="flex items-center gap-2 text-[13.5px] font-semibold">
           <input type="checkbox" name="kakaoFriend" defaultChecked={initial?.kakao_channel_friend} />
-          카카오 채널 친구추가 완료
+          カカオチャンネル友だち追加済み
         </label>
 
         {isMinor && (
           <div className="grid grid-cols-2 gap-3.5 pt-1">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-ink-mid">보호자 이름</label>
+              <label className="text-xs font-semibold text-ink-mid">保護者氏名</label>
               <input
                 name="guardianName"
                 defaultValue={initial?.guardian_name ?? ""}
@@ -127,7 +127,7 @@ export function StudentForm({
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-ink-mid">보호자 연락처 *</label>
+              <label className="text-xs font-semibold text-ink-mid">保護者連絡先 *</label>
               <input
                 name="guardianPhone"
                 type="tel"
@@ -141,7 +141,7 @@ export function StudentForm({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-ink-mid">메모</label>
+        <label className="text-xs font-semibold text-ink-mid">メモ</label>
         <textarea
           name="memo"
           rows={3}
@@ -161,7 +161,7 @@ export function StudentForm({
         disabled={pending}
         className="h-12 rounded-lg bg-accent text-white text-[15px] font-semibold disabled:opacity-60"
       >
-        {pending ? "저장 중..." : mode === "edit" ? "수정 저장" : "학생 등록"}
+        {pending ? "保存中..." : mode === "edit" ? "編集を保存" : "生徒を登録"}
       </button>
     </form>
   );

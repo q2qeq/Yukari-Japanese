@@ -1,8 +1,9 @@
 import { listClassroomsFull, getAllClassesWithSchedule } from "@/lib/director-queries";
-import { ClassroomForm } from "@/components/ClassroomForm";
 import { WeeklyScheduleGrid } from "@/components/WeeklyScheduleGrid";
 
-export default async function ClassroomsPage() {
+// 선생님도 강의실별로 언제 어떤 반이 쓰는지 볼 수 있도록 만든 읽기 전용 화면.
+// 강의실 추가/수정은 원장 전용(director/classrooms)에서만 가능하다.
+export default async function TeacherClassroomsPage() {
   const [classrooms, classes] = await Promise.all([
     listClassroomsFull(),
     getAllClassesWithSchedule(),
@@ -11,17 +12,12 @@ export default async function ClassroomsPage() {
   const unassigned = classes.filter((c) => !c.classroom_id);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-[22px] font-bold">教室</h1>
-        <p className="text-[13px] text-ink-mid mt-1">教室ごとにいつどのクラスが使うか確認できます。</p>
-      </div>
-
-      <ClassroomForm />
+    <div className="flex-1 flex flex-col px-5 pt-5 pb-8 gap-5">
+      <h1 className="text-[16.5px] font-bold">教室状況</h1>
 
       {classrooms.length === 0 && (
         <div className="bg-white rounded-2xl border border-line-light py-14 text-center text-[13px] text-ink-mid">
-          登録された教室がありません。上から追加してみましょう。
+          登録された教室がありません。
         </div>
       )}
 
@@ -36,7 +32,6 @@ export default async function ClassroomsPage() {
                   定員{room.capacity}名
                 </span>
               )}
-              {room.memo && <span className="text-[12px] text-ink-mid">{room.memo}</span>}
             </div>
             <WeeklyScheduleGrid
               rows={roomRows.map((r) => ({
