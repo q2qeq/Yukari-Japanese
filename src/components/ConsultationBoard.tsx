@@ -4,9 +4,11 @@ import { useEffect, useState, useTransition } from "react";
 import {
   updateConsultationStatus,
   updateConsultationNotes,
+  assignConsultationTeacher,
   type ConsultationStatus,
 } from "@/lib/actions/consultation-actions";
 import type { ConsultationRow } from "@/lib/director-queries";
+import type { TeacherOption } from "@/lib/queries";
 
 const COLUMNS: { key: ConsultationStatus; label: string }[] = [
   { key: "new", label: "新規" },
@@ -40,12 +42,16 @@ function toDateInputValue(d: string | Date | null): string {
 
 function ConsultationCard({
   row,
+  teachers,
   onStatusChange,
   onSaveDetails,
+  onAssignTeacher,
 }: {
   row: ConsultationRow;
+  teachers: TeacherOption[];
   onStatusChange: (status: ConsultationStatus) => void;
   onSaveDetails: (notes: string, followUpAt: string | null) => Promise<void>;
+  onAssignTeacher: (teacherId: string | null) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [notes, setNotes] = useState(row.notes ?? "");
@@ -94,6 +100,24 @@ function ConsultationCard({
 
       {row.notes && !expanded && (
         <p className="text-[11.5px] text-ink-mid line-clamp-2">{row.notes}</p>
+      )}
+
+      {row.status === "converted" && (
+        <div className="flex flex-col gap-1 pt-1">
+          <label className="text-[10.5px] font-semibold text-ink-mid">担当の先生</label>
+          <select
+            value={row.assigned_teacher_id ?? ""}
+            onChange={(e) => onAssignTeacher(e.target.value || null)}
+            className="h-8 rounded-lg border border-line-light px-2 text-[12px] outline-none focus:border-accent bg-white"
+          >
+            <option value="">未指定</option>
+            {teachers.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
 
       {expanded && (
@@ -176,7 +200,13 @@ function ConsultationCard({
   );
 }
 
-export function ConsultationBoard({ initialRows }: { initialRows: ConsultationRow[] }) {
+export function ConsultationBoard({
+  initialRows,
+  teachers,
+}: {
+  initialRows: ConsultationRow[];
+  teachers: TeacherOption[];
+}) {
   const [rows, setRows] = useState(initialRows);
   const [, startTransition] = useTransition();
 
@@ -200,6 +230,18 @@ export function ConsultationBoard({ initialRows }: { initialRows: ConsultationRo
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, notes, follow_up_at: followUpAt } : r)));
   }
 
+  function handleAssignTeacher(id: string, teacherId: string | null) {
+    const teacherName = teachers.find((t) => t.id === teacherId)?.name ?? null;
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === id ? { ...r, assigned_teacher_id: teacherId, assigned_teacher_name: teacherName } : r,
+      ),
+    );
+    startTransition(() => {
+      assignConsultationTeacher(id, teacherId);
+    });
+  }
+
   return (
     <div className="grid grid-cols-5 gap-4">
       {COLUMNS.map((col) => {
@@ -215,8 +257,10 @@ export function ConsultationBoard({ initialRows }: { initialRows: ConsultationRo
                 <ConsultationCard
                   key={row.id}
                   row={row}
+                  teachers={teachers}
                   onStatusChange={(status) => handleStatusChange(row.id, status)}
                   onSaveDetails={(notes, followUpAt) => handleSaveDetails(row.id, notes, followUpAt)}
+                  onAssignTeacher={(teacherId) => handleAssignTeacher(row.id, teacherId)}
                 />
               ))}
             </div>

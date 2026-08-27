@@ -91,3 +91,20 @@ export async function updateStaff(
   revalidatePath("/director/staff");
   redirect("/director/staff");
 }
+
+export type PayRateActionResult = { ok: true } | { ok: false; error: string };
+
+/** 給料計算機で使う先生の「セッション当たり単価」を保存(선택 입력, 원장 전용). */
+export async function updatePayRate(staffId: string, rate: number): Promise<PayRateActionResult> {
+  const session = await getSession();
+  if (!session || session.role !== "owner") {
+    return { ok: false, error: "権限がありません。" };
+  }
+  if (!Number.isFinite(rate) || rate < 0) {
+    return { ok: false, error: "単価をご確認ください。" };
+  }
+
+  await sql`update staff set pay_rate_per_session = ${Math.round(rate)} where id = ${staffId}`;
+  revalidatePath(`/director/staff/${staffId}`);
+  return { ok: true };
+}

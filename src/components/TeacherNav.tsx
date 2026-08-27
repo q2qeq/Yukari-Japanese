@@ -8,6 +8,7 @@ const NAV = [
   { href: "/students", label: "生徒" },
   { href: "/schedule", label: "時間割" },
   { href: "/classrooms", label: "教室" },
+  { href: "/monthly-reports", label: "月次報告" },
 ];
 
 export function TeacherNav() {

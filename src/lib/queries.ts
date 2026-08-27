@@ -100,6 +100,9 @@ export type StudentDetail = {
   is_minor: boolean;
   guardian_phone: string | null;
   level: string | null;
+  occupation: string | null;
+  study_purpose: string | null;
+  current_textbook: string | null;
   pass_id: string | null;
   remaining_sessions: number | null;
   pass_purchased_at: string | null;
@@ -109,6 +112,7 @@ export async function getStudentDetail(studentId: string) {
   const rows = await sql<StudentDetail[]>`
     select
       s.id as student_id, s.name, s.phone, s.is_minor, s.guardian_phone, s.level,
+      s.occupation, s.study_purpose, s.current_textbook,
       p.id as pass_id, p.remaining_sessions, p.purchased_at as pass_purchased_at
     from students s
     left join payment_passes p on p.student_id = s.id and p.status = 'active'
@@ -322,17 +326,28 @@ export type StudentEditData = {
   level: string | null;
   primary_teacher_id: string | null;
   status: "active" | "paused" | "withdrawn";
+  occupation: string | null;
+  study_purpose: string | null;
+  current_textbook: string | null;
   memo: string | null;
 };
 
 export async function getStudentForEdit(studentId: string) {
   const rows = await sql<StudentEditData[]>`
     select id, name, phone, is_minor, guardian_name, guardian_phone,
-           kakao_channel_friend, level, primary_teacher_id, status, memo
+           kakao_channel_friend, level, primary_teacher_id, status,
+           occupation, study_purpose, current_textbook, memo
     from students
     where id = ${studentId}
   `;
   return rows[0] ?? null;
+}
+
+export type StudentOption = { id: string; name: string };
+
+/** 아카이브 화면(수업일지/월별관리일지)의 학생 필터 드롭다운용 전체 학생 목록. */
+export async function listAllStudentOptions() {
+  return sql<StudentOption[]>`select id, name from students order by name`;
 }
 
 export type TeacherOption = { id: string; name: string; role: "owner" | "teacher" };
@@ -460,6 +475,7 @@ export type ClassRosterRow = {
   phone: string | null;
   status: "active" | "paused" | "withdrawn";
   remaining_sessions: number | null;
+  current_textbook: string | null;
   enrolled_at: string;
 };
 
@@ -467,7 +483,7 @@ export async function getClassRoster(classId: string) {
   return sql<ClassRosterRow[]>`
     select
       s.id as student_id, s.name, s.phone, s.status,
-      p.remaining_sessions,
+      p.remaining_sessions, s.current_textbook,
       ce.enrolled_at
     from class_enrollments ce
     join students s on s.id = ce.student_id
@@ -519,5 +535,54 @@ export async function getEnrolledClassesForStudent(studentId: string) {
     join class_schedule_slots slot on slot.class_id = c.id
     where ce.student_id = ${studentId} and ce.status = 'active' and c.status = 'active'
     order by slot.day_of_week, slot.start_time
+  `;
+}
+
+// ----------------------------------------------------------------------------
+// 수업일지 (선생님 쪽): 출석체크 후 "授業を終える"에서 학생별로 작성
+// ----------------------------------------------------------------------------
+
+export type JournalDraftRow = {
+  student_id: string;
+  content: string | null;
+  achievement: "A" | "B" | "C" | null;
+};
+
+/** 이 세션(회차)에 이미 저장된 수업일지가 있으면 학생별로 미리 채워 넣기 위한 조회. */
+export async function getClassJournalsForSession(sessionId: string) {
+  return sql<JournalDraftRow[]>`
+    select student_id, content, achievement
+    from class_journals
+    where class_session_id = ${sessionId}
+  `;
+}
+
+// ----------------------------------------------------------------------------
+// 월별 관리일지 (선생님 쪽): 매월 초, 담당 학생별로 작성해 원장에게 전송
+// ----------------------------------------------------------------------------
+
+export type MyStudentReportRow = {
+  student_id: string;
+  student_name: string;
+  level: string | null;
+  report_content: string | null;
+  report_updated_at: string | null;
+};
+
+/**
+ * 이 선생님(primary_teacher_id)이 담당하는 재원 학생 목록과, 지정된 달(report_month,
+ * 항상 1일로 정규화된 DATE 문자열 "YYYY-MM-01")에 이미 작성한 월별 관리일지가
+ * 있으면 그 내용을 함께 반환한다(수정 화면에서 이어서 작성할 수 있도록).
+ */
+export async function getMyStudentsForMonthlyReport(staffId: string, reportMonth: string) {
+  return sql<MyStudentReportRow[]>`
+    select
+      s.id as student_id, s.name as student_name, s.level,
+      mr.content as report_content, mr.updated_at as report_updated_at
+    from students s
+    left join monthly_reports mr
+      on mr.student_id = s.id and mr.report_month = ${reportMonth}::date
+    where s.primary_teacher_id = ${staffId} and s.status = 'active'
+    order by s.name
   `;
 }

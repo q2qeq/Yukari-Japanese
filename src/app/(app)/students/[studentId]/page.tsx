@@ -9,6 +9,7 @@ import {
 } from "@/lib/queries";
 import { dayLabel, hm } from "@/lib/schedule-utils";
 import { NotifyButton } from "@/components/NotifyButton";
+import { OCCUPATION_LABEL, STUDY_PURPOSE_LABEL, type StudentOccupation, type StudentStudyPurpose } from "@/lib/labels";
 
 const NOTIFICATION_STATUS_LABEL: Record<string, string> = {
   sent: "送信済み",
@@ -105,6 +106,26 @@ export default async function StudentDetailPage({
             </div>
           )}
         </div>
+
+        {(student.occupation || student.study_purpose || student.current_textbook) && (
+          <div className="flex flex-wrap gap-1.5">
+            {student.occupation && (
+              <span className="rounded-full bg-surface text-ink-mid px-2.5 py-1 text-[11.5px] font-semibold">
+                {OCCUPATION_LABEL[student.occupation as StudentOccupation] ?? student.occupation}
+              </span>
+            )}
+            {student.study_purpose && (
+              <span className="rounded-full bg-surface text-ink-mid px-2.5 py-1 text-[11.5px] font-semibold">
+                目的：{STUDY_PURPOSE_LABEL[student.study_purpose as StudentStudyPurpose] ?? student.study_purpose}
+              </span>
+            )}
+            {student.current_textbook && (
+              <span className="rounded-full bg-accent-soft text-accent px-2.5 py-1 text-[11.5px] font-semibold">
+                教材：{student.current_textbook}
+              </span>
+            )}
+          </div>
+        )}
 
         <div
           className={`rounded-2xl p-5 flex flex-col gap-1.5 ${

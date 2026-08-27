@@ -144,14 +144,22 @@ export function AttendanceRoster({
         })}
       </div>
 
-      <div className="flex items-center justify-between border-t border-line-light px-5 py-3.5">
+      <div className="flex items-center justify-between border-t border-line-light px-5 py-3.5 gap-2">
         <p className="text-[12.5px] text-ink-mid">
           {roster.length}名中 <span className="text-ink font-bold">{checkedCount}名</span> チェック
           完了
         </p>
-        <Link href="/" className="text-[13px] text-accent font-bold">
-          ホームへ
-        </Link>
+        <div className="flex items-center gap-3 shrink-0">
+          <Link href="/" className="text-[13px] text-ink-mid font-semibold">
+            ホームへ
+          </Link>
+          <Link
+            href={`/sessions/${sessionId}/journal`}
+            className="rounded-lg bg-ink text-white text-[12.5px] font-bold px-3.5 py-2"
+          >
+            授業を終える（日誌へ）
+          </Link>
+        </div>
       </div>
 
       {confirmTarget && (

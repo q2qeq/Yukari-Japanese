@@ -70,6 +70,7 @@ export default async function UnpaidManagementPage({
               <tr className="border-b border-line-light text-left text-ink-mid text-[12px]">
                 <th className="px-5 py-3 font-semibold">名前</th>
                 <th className="px-5 py-3 font-semibold">電話番号</th>
+                <th className="px-5 py-3 font-semibold">担当の先生</th>
                 <th className="px-5 py-3 font-semibold">残り回数</th>
                 <th className="px-5 py-3 font-semibold">通知送信</th>
                 <th className="px-5 py-3 font-semibold"></th>
@@ -78,7 +79,7 @@ export default async function UnpaidManagementPage({
             <tbody>
               {lowBalance.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-ink-mid">
+                  <td colSpan={6} className="px-5 py-10 text-center text-ink-mid">
                     残り回数が少ない生徒はいません。
                   </td>
                 </tr>
@@ -87,6 +88,7 @@ export default async function UnpaidManagementPage({
                 <tr key={row.pass_id} className="border-b border-line-light last:border-none">
                   <td className="px-5 py-3.5 font-semibold">{row.student_name}</td>
                   <td className="px-5 py-3.5 font-mono text-ink-mid">{row.phone ?? "-"}</td>
+                  <td className="px-5 py-3.5 text-ink-mid">{row.primary_teacher_name ?? "未指定"}</td>
                   <td className="px-5 py-3.5">
                     <span className="rounded-full bg-warn-soft text-warn px-2.5 py-0.5 text-[11.5px] font-bold">
                       残り{row.remaining_sessions}回
@@ -118,6 +120,7 @@ export default async function UnpaidManagementPage({
               <tr className="border-b border-line-light text-left text-ink-mid text-[12px]">
                 <th className="px-5 py-3 font-semibold">名前</th>
                 <th className="px-5 py-3 font-semibold">電話番号</th>
+                <th className="px-5 py-3 font-semibold">担当の先生</th>
                 <th className="px-5 py-3 font-semibold">理由</th>
                 <th className="px-5 py-3 font-semibold">未払い回数</th>
                 <th className="px-5 py-3 font-semibold"></th>
@@ -126,7 +129,7 @@ export default async function UnpaidManagementPage({
             <tbody>
               {filteredUnpaid.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-ink-mid">
+                  <td colSpan={6} className="px-5 py-10 text-center text-ink-mid">
                     該当する生徒はいません。
                   </td>
                 </tr>
@@ -137,6 +140,7 @@ export default async function UnpaidManagementPage({
                   <tr key={row.student_id} className="border-b border-line-light last:border-none">
                     <td className="px-5 py-3.5 font-semibold">{row.student_name}</td>
                     <td className="px-5 py-3.5 font-mono text-ink-mid">{row.phone ?? "-"}</td>
+                    <td className="px-5 py-3.5 text-ink-mid">{row.primary_teacher_name ?? "未指定"}</td>
                     <td className="px-5 py-3.5">
                       <span className={`rounded-full px-2.5 py-0.5 text-[11.5px] font-bold ${badge.className}`}>
                         {badge.label}

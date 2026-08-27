@@ -102,3 +102,18 @@ export async function updateConsultationNotes(
   revalidatePath("/director/consultations");
   return { ok: true };
 }
+
+/** 登録完了(converted)段階で担当の先生を割り当てる。 */
+export async function assignConsultationTeacher(
+  id: string,
+  teacherId: string | null,
+): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session || session.role !== "owner") {
+    return { ok: false, error: "権限がありません。" };
+  }
+
+  await sql`update consultations set assigned_teacher_id = ${teacherId} where id = ${id}`;
+  revalidatePath("/director/consultations");
+  return { ok: true };
+}

@@ -1,9 +1,10 @@
 import { getConsultations } from "@/lib/director-queries";
+import { listActiveTeachers } from "@/lib/queries";
 import { NewConsultationForm } from "@/components/NewConsultationForm";
 import { ConsultationBoard } from "@/components/ConsultationBoard";
 
 export default async function ConsultationManagementPage() {
-  const consultations = await getConsultations();
+  const [consultations, teachers] = await Promise.all([getConsultations(), listActiveTeachers()]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -23,7 +24,7 @@ export default async function ConsultationManagementPage() {
           登録された相談がありません。上から新規相談を登録してみましょう。
         </div>
       ) : (
-        <ConsultationBoard initialRows={consultations} />
+        <ConsultationBoard initialRows={consultations} teachers={teachers} />
       )}
     </div>
   );

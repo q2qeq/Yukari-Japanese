@@ -7,6 +7,7 @@ import {
   type StudentFormState,
 } from "@/lib/actions/student-actions";
 import type { StudentEditData, TeacherOption } from "@/lib/queries";
+import { OCCUPATION_LABEL, OCCUPATION_OPTIONS, STUDY_PURPOSE_LABEL, STUDY_PURPOSE_OPTIONS } from "@/lib/labels";
 
 const STATUS_LABEL: Record<string, string> = {
   active: "在籍",
@@ -98,6 +99,45 @@ export function StudentForm({
               </option>
             ))}
           </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-ink-mid">職業</label>
+          <select
+            name="occupation"
+            defaultValue={initial?.occupation ?? ""}
+            className="h-11 rounded-lg border border-line px-3 text-[14px] outline-none focus:border-accent bg-white"
+          >
+            <option value="">未指定</option>
+            {OCCUPATION_OPTIONS.map((value) => (
+              <option key={value} value={value}>
+                {OCCUPATION_LABEL[value]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-ink-mid">受講目的</label>
+          <select
+            name="studyPurpose"
+            defaultValue={initial?.study_purpose ?? ""}
+            className="h-11 rounded-lg border border-line px-3 text-[14px] outline-none focus:border-accent bg-white"
+          >
+            <option value="">未指定</option>
+            {STUDY_PURPOSE_OPTIONS.map((value) => (
+              <option key={value} value={value}>
+                {STUDY_PURPOSE_LABEL[value]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5 col-span-2">
+          <label className="text-xs font-semibold text-ink-mid">現在の教材</label>
+          <input
+            name="currentTextbook"
+            placeholder="例：みんなの日本語 初級I"
+            defaultValue={initial?.current_textbook ?? ""}
+            className="h-11 rounded-lg border border-line px-3 text-[14px] outline-none focus:border-accent"
+          />
         </div>
       </div>
 

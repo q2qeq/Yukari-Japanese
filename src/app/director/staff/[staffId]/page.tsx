@@ -5,25 +5,44 @@ import {
   getClassesForStaff,
   getScheduleSlotsForStaffClasses,
   getRosterForStaffClasses,
+  getTeacherMonthlyAttendance,
 } from "@/lib/director-queries";
 import { dayLabel, hm } from "@/lib/schedule-utils";
+import { PayrollCalculator } from "@/components/PayrollCalculator";
+
+function monthStartParam(month?: string): string {
+  if (month && /^\d{4}-\d{2}$/.test(month)) return `${month}-01`;
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+}
 
 export default async function StaffDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ staffId: string }>;
+  searchParams: Promise<{ month?: string }>;
 }) {
   const { staffId } = await params;
+  const { month } = await searchParams;
   const staff = await getStaffForEdit(staffId);
   if (!staff) notFound();
 
-  const [classes, slots, roster] = await Promise.all([
+  const monthStart = monthStartParam(month);
+
+  const [classes, slots, roster, attendance] = await Promise.all([
     getClassesForStaff(staffId),
     getScheduleSlotsForStaffClasses(staffId),
     getRosterForStaffClasses(staffId),
+    getTeacherMonthlyAttendance(staffId, monthStart),
   ]);
 
   const studentCount = new Set(roster.map((r) => r.student_id)).size;
+  const monthLabel = new Date(monthStart).toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "long",
+  });
+  const monthInputValue = monthStart.slice(0, 7);
 
   return (
     <div className="flex flex-col gap-6">
@@ -43,6 +62,30 @@ export default async function StaffDetailPage({
           情報編集
         </Link>
       </div>
+
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-semibold text-ink-mid uppercase tracking-wide">
+          給料計算対象月
+        </span>
+        <form className="flex items-center gap-2">
+          <input
+            type="month"
+            name="month"
+            defaultValue={monthInputValue}
+            className="h-9 rounded-lg border border-line px-2.5 text-[13px] outline-none focus:border-accent"
+          />
+          <button type="submit" className="h-9 rounded-lg border border-line text-[12.5px] font-semibold px-3">
+            表示
+          </button>
+        </form>
+      </div>
+
+      <PayrollCalculator
+        staffId={staffId}
+        initialRate={staff.pay_rate_per_session}
+        attendance={attendance}
+        monthLabel={monthLabel}
+      />
 
       {classes.length === 0 ? (
         <div className="bg-white rounded-2xl border border-line-light py-14 text-center text-[13px] text-ink-mid">

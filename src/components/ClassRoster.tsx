@@ -58,12 +58,19 @@ export function ClassRoster({
               <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-xs font-bold text-ink-mid shrink-0">
                 {row.name.slice(0, 1)}
               </div>
-              <span className="text-[13.5px] font-semibold truncate">{row.name}</span>
-              <span
-                className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${chip.className}`}
-              >
-                {chip.label}
-              </span>
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[13.5px] font-semibold truncate">{row.name}</span>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${chip.className}`}
+                  >
+                    {chip.label}
+                  </span>
+                </div>
+                {row.current_textbook && (
+                  <span className="text-[11px] text-ink-mid truncate">教材：{row.current_textbook}</span>
+                )}
+              </div>
             </Link>
             <button
               type="button"

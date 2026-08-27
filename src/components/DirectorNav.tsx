@@ -8,6 +8,8 @@ const NAV = [
   { href: "/director/unpaid", label: "未払い・通知状況" },
   { href: "/director/consultations", label: "相談管理" },
   { href: "/director/payments", label: "支払い履歴" },
+  { href: "/director/journals", label: "授業日誌" },
+  { href: "/director/monthly-reports", label: "月次管理報告" },
   { href: "/director/schedule", label: "全体時間割" },
   { href: "/director/classrooms", label: "教室" },
   { href: "/director/students", label: "生徒管理" },

@@ -3,7 +3,12 @@ import {
   getTodayOverviewAllTeachers,
   getDashboardCounts,
   getTodayPaymentStats,
+  getUndismissedRecentPayments,
+  getRecentClassJournals,
+  getRecentMonthlyReports,
 } from "@/lib/director-queries";
+import { RecentPaymentsWidget } from "@/components/RecentPaymentsWidget";
+import { ACHIEVEMENT_BADGE_CLASS } from "@/lib/labels";
 
 function hm(t: string) {
   return t.slice(0, 5);
@@ -43,10 +48,13 @@ function StatCard({
 }
 
 export default async function DirectorHomePage() {
-  const [sessions, counts, paymentStats] = await Promise.all([
+  const [sessions, counts, paymentStats, recentPayments, recentJournals, recentReports] = await Promise.all([
     getTodayOverviewAllTeachers(),
     getDashboardCounts(),
     getTodayPaymentStats(),
+    getUndismissedRecentPayments(),
+    getRecentClassJournals(),
+    getRecentMonthlyReports(),
   ]);
 
   const today = new Date().toLocaleDateString("ja-JP", {
@@ -147,6 +155,73 @@ export default async function DirectorHomePage() {
             })}
           </div>
         )}
+      </div>
+
+      <div className="bg-white rounded-2xl border border-line-light">
+        <div className="px-5 py-4 border-b border-line-light flex items-center justify-between">
+          <h2 className="text-[15px] font-bold">最近の支払い</h2>
+          <Link href="/director/payments" className="text-[12px] font-semibold text-accent">
+            支払い履歴を見る →
+          </Link>
+        </div>
+        <RecentPaymentsWidget initialRows={recentPayments} />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl border border-line-light">
+          <div className="px-5 py-4 border-b border-line-light flex items-center justify-between">
+            <h2 className="text-[15px] font-bold">最近の授業日誌</h2>
+            <Link href="/director/journals" className="text-[12px] font-semibold text-accent">
+              アーカイブを見る →
+            </Link>
+          </div>
+          {recentJournals.length === 0 ? (
+            <p className="text-center text-[13px] text-ink-mid py-10">まだ授業日誌がありません。</p>
+          ) : (
+            <div className="divide-y divide-line-light">
+              {recentJournals.map((j) => (
+                <div key={j.id} className="px-5 py-3 flex flex-col gap-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[13px] font-semibold">
+                      {j.student_name}
+                      <span className="font-normal text-ink-mid"> ・{j.teacher_name}先生</span>
+                    </span>
+                    <span
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-bold ${ACHIEVEMENT_BADGE_CLASS[j.achievement]}`}
+                    >
+                      {j.achievement}
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-ink-mid line-clamp-1">{j.content}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl border border-line-light">
+          <div className="px-5 py-4 border-b border-line-light flex items-center justify-between">
+            <h2 className="text-[15px] font-bold">最近の月次管理報告</h2>
+            <Link href="/director/monthly-reports" className="text-[12px] font-semibold text-accent">
+              アーカイブを見る →
+            </Link>
+          </div>
+          {recentReports.length === 0 ? (
+            <p className="text-center text-[13px] text-ink-mid py-10">まだ月次管理報告がありません。</p>
+          ) : (
+            <div className="divide-y divide-line-light">
+              {recentReports.map((r) => (
+                <div key={r.id} className="px-5 py-3 flex flex-col gap-1">
+                  <span className="text-[13px] font-semibold">
+                    {r.student_name}
+                    <span className="font-normal text-ink-mid"> ・{r.teacher_name}先生</span>
+                  </span>
+                  <p className="text-[12px] text-ink-mid line-clamp-1">{r.content}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
